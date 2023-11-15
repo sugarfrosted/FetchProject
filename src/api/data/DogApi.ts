@@ -1,23 +1,7 @@
 import axios, {AxiosError, AxiosInstance, AxiosResponse, CreateAxiosDefaults} from 'axios'
-import { Dog, DogsSearchResult, Match } from './data/interfaces';
+import { Dog, DogsSearchResult, Match } from './interfaces';
 
 export default class DogApiSession {
-    private _name: string = "";
-    public get Name(): string {
-        return this._name;
-    }
-    protected set Name(value: string) {
-        this._name = value;
-    }
-
-    private _email: string = "";
-    public get Email(): string {
-        return this._email;
-    }
-    protected set Email(value: string) {
-        this._email = value;
-    }
-
     private axiosInstance: AxiosInstance;
 
     constructor() {
@@ -29,59 +13,20 @@ export default class DogApiSession {
         } as CreateAxiosDefaults<any>);
     }
 
-    /**
-     * Login to the api and start a new session
-     */
-    public async Post_Auth_Login(name:string, email: string) {
-        this.Name = name;
-        this.Email = email;
-
-        const request = await this.axiosInstance.request(
-            {
-                method: 'post',
-                url: '/auth/login',
-                data: {
-                    name: this.Name,
-                    email: this.Email,
-                }
-            }
-        );
-
-        if (request.status !== 200)
-        {
-            Promise.reject("Not successful.");
-        }
-    }
-
-    public async Post_Auth_Logout(){
-        const request = await this.axiosInstance.request(
-            {
-                method: 'post',
-                url: '/auth/logout',
-            }
-        );
-
-        if (request.status !== 200)
-        {
-            Promise.reject("Not successful.");
-        }
-    };
-
-
     public async Get_Dogs_Breeds(): Promise<string[]>
     {
         const response = await this.axiosInstance.request(
             {
                 method: 'get',
                 url: '/dogs/breeds',
-            });
+            }) as AxiosResponse<string[]>;
 
         if (response.status !== 200)
         {
             Promise.reject("Not successful.")
         }
 
-        return (response.data && []) as string[]
+        return response.data && [];
 
     }
 
@@ -92,14 +37,14 @@ export default class DogApiSession {
                 method: 'get',
                 url: '/dogs/search',
                 params: params,
-            });
+            }) as AxiosResponse<DogsSearchResult>;
 
         if (response.status !== 200)
         {
             return Promise.reject('Not successful');
         }
 
-        return response.data as DogsSearchResult;
+        return response.data;
     }
     
     public async Post_Dogs(dogsIds: string[]) : Promise<Dog[]> {
@@ -110,13 +55,14 @@ export default class DogApiSession {
                 url: '/dogs',
                 data: dogsIds,
             }
-        );
+        ) as AxiosResponse<Dog[]>;
+
         if (result.status !== 200)
         {
             return Promise.reject('Not successful.');
         }
 
-        return result.data as Dog[];
+        return result.data && [];
     }
 
     public async Post_Dogs_Match(dogsIds: string[]) : Promise<Match> {
@@ -126,14 +72,14 @@ export default class DogApiSession {
                 method: 'post',
                 url: '/dogs/match',
                 data: dogsIds,
-            });
+            }) as AxiosResponse<Match>;
 
         if (result.status !== 200)
         {
             return Promise.reject('Not successful.');
         }
 
-        return result.data as Match;
+        return result.data;
     }
 
     public async Post_Locations(zipCodes: string[]) : Promise<Location[]>
@@ -143,14 +89,14 @@ export default class DogApiSession {
                 method: 'post',
                 url: '/locations',
                 data: zipCodes,
-            });
+            }) as AxiosResponse<Location[]>;
 
         if (response.status !== 200)
         {
             return Promise.reject('Not successful.');
         }
 
-        return (response.data && []) as Location[];
+        return response.data && [];
     }
 
     public async Locations_Search(params: locationsParams) : Promise<mapSearchResults>
@@ -160,14 +106,14 @@ export default class DogApiSession {
                 method: 'post',
                 url: '/locations',
                 data: params,
-            });
+            }) as AxiosResponse<mapSearchResults>;
 
         if (response.status !== 200)
         {
             return Promise.reject('Not successful.');
         }
 
-        return response.data as mapSearchResults;
+        return response.data;
     }
 }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import DogApiSession from './api/DogApi';
+import DogApiSession from './api/data/DogApi';
 
 function App() {
 
