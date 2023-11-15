@@ -1,11 +1,13 @@
 import React from 'react';
 import logo from './logo.svg';
-import './App.css';
 import DogApiSession from './api/data/DogApi';
-import { AppBar, Toolbar, IconButton, Typography, Button } from '@mui/material';
-import { Menu } from '@mui/icons-material'
+import { AppBar, Button, IconButton, Toolbar, Typography } from '@mui/material';
 
-function App() {
+export function App() {
+
+  async function debugging() {
+    const test = new DogApiSession();
+  }
 
   return (
     <div className="App">
@@ -18,6 +20,7 @@ function App() {
             aria-label="menu"
             sx={{ mr: 2 }}
           >
+            <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             News
@@ -38,9 +41,8 @@ function App() {
         >
           Learn React
         </a>
+        <button onClick={(event) => { console.log("click"); debugging(); }}>Text</button>
       </header>
     </div>
   );
 }
-
-export default App;
