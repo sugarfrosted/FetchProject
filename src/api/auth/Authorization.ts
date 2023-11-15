@@ -4,19 +4,19 @@ import axios, {AxiosInstance, CreateAxiosDefaults} from 'axios'
  * The api calls that handle authorization.
  */
 export default class Authorization {
-    private _name: string = "";
-    public get Name(): string {
+    private _name: string | null = null;
+    public get Name(): string | null {
         return this._name;
     }
-    protected set Name(value: string) {
+    protected set Name(value: string | null) {
         this._name = value;
     }
 
-    private _email: string = "";
-    public get Email(): string {
+    private _email: string | null = null;
+    public get Email(): string | null {
         return this._email;
     }
-    protected set Email(value: string) {
+    protected set Email(value: string | null) {
         this._email = value;
     }
 
@@ -35,16 +35,13 @@ export default class Authorization {
      * Login to the api and start a new session
      */
     public async Post_Auth_Login(name: string, email: string) {
-        this.Name = name;
-        this.Email = email;
-
         const request = await this.axiosInstance.request(
             {
                 method: 'post',
                 url: '/auth/login',
                 data: {
-                    name: this.Name,
-                    email: this.Email,
+                    name: name,
+                    email: email,
                 }
             }
         );
@@ -53,6 +50,10 @@ export default class Authorization {
         {
             Promise.reject("Not successful.");
         }
+
+        this.Name = name;
+        this.Email = email;
+
     }
 
     /**
@@ -65,6 +66,9 @@ export default class Authorization {
                 url: '/auth/logout',
             }
         );
+
+        this.Name = null;
+        this.Email = null;
 
         if (request.status !== 200)
         {
