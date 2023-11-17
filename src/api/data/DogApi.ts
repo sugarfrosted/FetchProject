@@ -1,8 +1,77 @@
-import axios, {AxiosError, AxiosInstance, AxiosResponse, CreateAxiosDefaults} from 'axios'
+import axios, {AxiosInstance, AxiosResponse, CreateAxiosDefaults} from 'axios'
 import { Dog, DogsSearchResult, Match } from './interfaces';
 
-export default class DogApiSession {
+
+
+export default class DogApi {
+
+    private _name: string | null = null;
+
+    IsLoggedIn: boolean = false;
+
+    public get Name(): string | null {
+        return this._name;
+    }
+    protected set Name(value: string | null) {
+        this._name = value;
+    }
+
+    private _email: string | null = null;
+    public get Email(): string | null {
+        return this._email;
+    }
+    protected set Email(value: string | null) {
+        this._email = value;
+    }
+
     private axiosInstance: AxiosInstance;
+
+    /**
+     * Login to the api and start a new session
+     */
+    public async Post_Auth_Login(name: string, email: string) {
+        const request = await this.axiosInstance.request(
+            {
+                method: 'post',
+                url: '/auth/login',
+                data: {
+                    name: name,
+                    email: email,
+                }
+            }
+        );
+
+        if (request.status !== 200 && request.status !== 401)
+        {
+            Promise.reject("Not successful.");
+        }
+
+        this.Name = name;
+        this.Email = email;
+        this.IsLoggedIn = true;
+
+    }
+
+    /**
+     * Revoke cookie
+     */
+    public async Post_Auth_Logout(): Promise<void> {
+        const request = await this.axiosInstance.request(
+            {
+                method: 'post',
+                url: '/auth/logout',
+            }
+        );
+
+        this.Name = null;
+        this.Email = null;
+        this.IsLoggedIn = false;
+
+        if (this.isRequestSuccessful(request))
+        {
+            Promise.reject("Not successful.");
+        }
+    }
 
     constructor() {
         const baseURL = "https://frontend-take-home-service.fetch.com"; // TODO: Move this to a configuration file
@@ -13,6 +82,7 @@ export default class DogApiSession {
         } as CreateAxiosDefaults<any>);
     }
 
+
     public async Get_Dogs_Breeds(): Promise<string[]>
     {
         const response = await this.axiosInstance.request(
@@ -21,7 +91,7 @@ export default class DogApiSession {
                 url: '/dogs/breeds',
             }) as AxiosResponse<string[]>;
 
-        if (response.status !== 200)
+        if (this.isRequestSuccessful(response))
         {
             Promise.reject("Not successful.")
         }
@@ -39,7 +109,7 @@ export default class DogApiSession {
                 params: params,
             }) as AxiosResponse<DogsSearchResult>;
 
-        if (response.status !== 200)
+        if (this.isRequestSuccessful(response))
         {
             return Promise.reject('Not successful');
         }
@@ -49,7 +119,7 @@ export default class DogApiSession {
     
     public async Post_Dogs(dogsIds: string[]) : Promise<Dog[]> {
 
-        const result = await this.axiosInstance.request(
+        const response = await this.axiosInstance.request(
             {
                 method: 'post',
                 url: '/dogs',
@@ -57,29 +127,29 @@ export default class DogApiSession {
             }
         ) as AxiosResponse<Dog[]>;
 
-        if (result.status !== 200)
+        if (this.isRequestSuccessful(response))
         {
             return Promise.reject('Not successful.');
         }
 
-        return result.data && [];
+        return response.data && [];
     }
 
     public async Post_Dogs_Match(dogsIds: string[]) : Promise<Match> {
 
-        const result = await this.axiosInstance.request(
+        const response = await this.axiosInstance.request(
             {
                 method: 'post',
                 url: '/dogs/match',
                 data: dogsIds,
             }) as AxiosResponse<Match>;
 
-        if (result.status !== 200)
+        if (this.isRequestSuccessful(response))
         {
             return Promise.reject('Not successful.');
         }
 
-        return result.data;
+        return response.data;
     }
 
     public async Post_Locations(zipCodes: string[]) : Promise<Location[]>
@@ -91,7 +161,7 @@ export default class DogApiSession {
                 data: zipCodes,
             }) as AxiosResponse<Location[]>;
 
-        if (response.status !== 200)
+        if (this.isRequestSuccessful(response))
         {
             return Promise.reject('Not successful.');
         }
@@ -108,12 +178,22 @@ export default class DogApiSession {
                 data: params,
             }) as AxiosResponse<mapSearchResults>;
 
-        if (response.status !== 200)
+        if (this.isRequestSuccessful(response))
         {
             return Promise.reject('Not successful.');
         }
 
         return response.data;
+    }
+
+    private isRequestSuccessful(request: AxiosResponse<any, any>) {
+        if (request.status === 401)
+        {
+            this.Name = null;
+            this.Email = null;
+            this.IsLoggedIn = false;
+        }
+        return request.status !== 200;
     }
 }
 
