@@ -3,7 +3,7 @@ import { Dog, DogsSearchResult, Match } from './interfaces';
 
 
 
-export default class DogApi {
+export default class DogFetchInverviewApi {
 
     private _name: string | null = null;
 
@@ -29,7 +29,7 @@ export default class DogApi {
     /**
      * Login to the api and start a new session
      */
-    public async Post_Auth_Login(name: string, email: string) {
+    public async Post_Auth_Login(name: string, email: string): Promise<{ name: string; email: string; isLoggedIn: boolean; }> {
         const request = await this.axiosInstance.request(
             {
                 method: 'post',
@@ -49,6 +49,8 @@ export default class DogApi {
         this.Name = name;
         this.Email = email;
         this.IsLoggedIn = true;
+
+        return {name: this.Name, email: this.Email, isLoggedIn: this.IsLoggedIn }
 
     }
 
@@ -96,8 +98,7 @@ export default class DogApi {
             Promise.reject("Not successful.")
         }
 
-        return response.data && [];
-
+        return response.data || [];
     }
 
     public async Get_Dogs_Search(params: dogParams): Promise<DogsSearchResult>
@@ -132,7 +133,7 @@ export default class DogApi {
             return Promise.reject('Not successful.');
         }
 
-        return response.data && [];
+        return response.data || [];
     }
 
     public async Post_Dogs_Match(dogsIds: string[]) : Promise<Match> {
@@ -166,7 +167,7 @@ export default class DogApi {
             return Promise.reject('Not successful.');
         }
 
-        return response.data && [];
+        return response.data || [];
     }
 
     public async Locations_Search(params: locationsParams) : Promise<mapSearchResults>
@@ -197,7 +198,7 @@ export default class DogApi {
     }
 }
 
-interface mapSearchResults {
+export interface mapSearchResults {
     results: Location[];
     total: number;
 }

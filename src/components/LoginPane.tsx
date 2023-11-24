@@ -1,6 +1,7 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
-import { ChangeEvent, useState } from "react"
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, setRef } from "@mui/material";
+import { ChangeEvent, useEffect, useRef, useState } from "react"
 import { validate as isValidEmail } from "email-validator";
+import Authorization from "../api/auth/Authorization";
 
 export default function LoginPane(params: loginPaneParams)
 {
@@ -8,8 +9,17 @@ export default function LoginPane(params: loginPaneParams)
     const [email, setEmail] = useState("");
     const [emailHasError, setEmailHasError] = useState(false);
     const [nameHasError, setNameHasError] = useState(false);
+    const tfNameRef = useRef<HTMLDivElement>(null);
 
-    function handleLoginAttempt(event: any): void {
+    useEffect(() => {
+      setName("");
+      setEmail("");
+      setNameHasError(false);
+      setEmailHasError(false);
+      if (tfNameRef?.current) tfNameRef.current.focus();
+    }, [tfNameRef, params.open])
+
+    async function handleLoginAttempt() {
         setNameHasError(!name);
         setEmailHasError(!isValidEmail(email));
 
@@ -18,12 +28,28 @@ export default function LoginPane(params: loginPaneParams)
             return;
         }
 
-        console.log("you did it!");
+        var loginAttempt = await params.loginLookup.Login(name, email);
 
+        if(!loginAttempt.isLoggedIn)
+        {
+          return;
+        }
+
+        if (params.onSuccess)
+        {
+          params.onSuccess(name, email);
+        }
+
+        handleClose();
+     }
+
+    async function handleClose() 
+    {
+      params.onClose();
     }
 
     return (
-      <Dialog open={params.isVisible}>
+      <Dialog open={params.open}>
         <DialogTitle>Login</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -31,6 +57,8 @@ export default function LoginPane(params: loginPaneParams)
           </DialogContentText>
           <TextField
             required
+            error={nameHasError}
+            helperText={nameHasError ? "Please enter your name" : ""}
             margin="dense"
             id="name"
             label="Name"
@@ -39,17 +67,18 @@ export default function LoginPane(params: loginPaneParams)
             onBlur={(event => {setNameHasError(!name)})}
             fullWidth
             variant="standard"
+            inputRef={tfNameRef}
           />
           <TextField
-            autoFocus
+            required
             margin="dense"
             id="email"
             label="Email Address"
             type="email"
             error={emailHasError}
-            helperText={"Please enter a valid email."}
+            helperText={emailHasError ? "Please enter a valid email" : ""}
             value={email}
-            onBlur={(event => {setEmailHasError(isValidEmail(email))})}
+            onBlur={(event => {setEmailHasError(!isValidEmail(email))})}
             onChange={event => onEmailChanged(event)}
             
             fullWidth
@@ -58,6 +87,7 @@ export default function LoginPane(params: loginPaneParams)
         </DialogContent>
         <DialogActions>
           <Button onClick={handleLoginAttempt}>Login</Button>
+          <Button onClick={handleClose}>Cancel</Button>
         </DialogActions>
       </Dialog>);
 
@@ -79,6 +109,9 @@ export default function LoginPane(params: loginPaneParams)
 }
 
 export interface loginPaneParams {
-    isVisible: true;
+    onSuccess?: ((name: string, email: string) => void) | undefined;
+    onClose: () => void;
+    open: boolean;
+    loginLookup: Authorization;
 }
 
