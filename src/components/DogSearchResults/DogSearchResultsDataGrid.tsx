@@ -22,10 +22,11 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     const [sortKey, setSortKey] = useState<keyof Dog | undefined>();
     const apiRef = useGridApiRef();
 
-    useEffect(() => {props.ref.current = {
-        clearSelection: async () => { return;},
-        sortKey: sortKey || 'name'
-    }
+    useEffect(() => {
+        props.ref.current = {
+            clearSelection: async () => { return;},
+            sortKey: sortKey || 'name'
+        }
     }, [props.ref])
 
     useEffect(() => { if(props.ref.current) {
@@ -98,10 +99,10 @@ interface DogSearchResultsDataGridProps {
     rowCount: number;
     onPaginationModelChange: (model: GridPaginationModel, details: GridCallbackDetails<any>) => void;
     onSortModelChange: (model: GridSortModel, details: GridCallbackDetails<any>) => void;
-    ref: React.MutableRefObject<DogSearchResultsDataGridRef>;
+    ref: React.MutableRefObject<DogSearchResultsDataGridRef | undefined>;
 }
 
 export interface DogSearchResultsDataGridRef {
     clearSelection: () => Promise<void>;
-    sortKey: keyof Dog |undefined;
+    sortKey: keyof Dog | undefined;
 }
