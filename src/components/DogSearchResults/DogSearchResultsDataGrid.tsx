@@ -1,9 +1,11 @@
 import { Image } from '@mui/icons-material';
 import { Icon, IconButton, Popover } from '@mui/material';
-import { DataGrid, GridCallbackDetails, GridColDef, GridInputRowSelectionModel, GridPaginationModel, GridRenderCellParams, GridRowId, GridRowsProp, GridValueFormatterParams } from '@mui/x-data-grid';
-import { MouseEventHandler, useState } from 'react';
+import { DataGrid, GridCallbackDetails, GridColDef, GridInputRowSelectionModel, GridPaginationModel, GridRenderCellParams, GridRowId, GridRowsProp, GridSortModel, GridValueFormatterParams, useGridApiRef } from '@mui/x-data-grid';
+import { MouseEventHandler, useEffect, useState } from 'react';
+import { Interface } from 'readline';
+import { Dog } from '../../api/shared/interfaces';
 
-export default function DogSearchResultsDataGrid() {
+export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps) {
     const columns: GridColDef[] = [
         { field: 'name', headerName: 'Name', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, flex: 1 },
         { field: 'img', headerName: 'Image', sortable: false, hideable: false ,filterable: false, disableColumnMenu: true, renderCell: (data) => getDogImageAnchor(data) },
@@ -11,19 +13,25 @@ export default function DogSearchResultsDataGrid() {
         { field: 'zip_code', headerName: 'ZIP Code', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, },
         { field: 'breed', headerName: 'Breed', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, flex: 1},
     ];
-    const rows: GridRowsProp = [
-        { id: 1, name: 'Hello', age: 27, img: "aaaaa" },
-        { id: 2, name: 'Hello', age: 27 },
-        { id: 3, name: 'Hello', age: 27 },
-    ];
     const paginationModel: GridPaginationModel = {
         pageSize: 25,
         page: 0,
     };
 
     const [anchorEl, setAnchorEl] = useState<Element|null>(null);
-    const [imageLocked, setImageLocked] = useState<boolean>(false)
-    const [rowSelectionModel, setRowSelectionModel] = useState<GridRowId[]>([]);
+    const [sortKey, setSortKey] = useState<keyof Dog | undefined>();
+    const apiRef = useGridApiRef();
+
+    useEffect(() => {props.ref.current = {
+        clearSelection: async () => { return;},
+        sortKey: sortKey || 'name'
+    }
+    }, [props.ref])
+
+    useEffect(() => { if(props.ref.current) {
+        props.ref.current.sortKey = sortKey;
+    }},[sortKey, props.ref.current]);
+
 
     function getDogImageAnchor(data: GridRenderCellParams) : any {
         return <IconButton onMouseOver={imageMouseEventHandler} onMouseLeave={imageMouseEventHandler} onClick={imageMouseEventHandler}><Image/></IconButton>
@@ -35,13 +43,40 @@ export default function DogSearchResultsDataGrid() {
         } 
 
 
+    /**
+     * Get the next or previous. Might need to see if this is a new load.
+     * @param model 
+     * @param details 
+     */
     function onPaginationModelChange(model: GridPaginationModel, details: GridCallbackDetails<any>): void {
-        console.log(model); console.log(details)
+        console.log(model); console.log(details);
     }
 
 
+    /**
+     * This should keep selection but invalidate the paging model, i.e., take you to page 1.
+     * @param model 
+     * @param details 
+    */
+    function onSortModelChange(model: GridSortModel, details: GridCallbackDetails<any>): void {
+        throw new Error('Function not implemented.');
+    }
+
     return ( <>
-    <DataGrid rowSelectionModel={rowSelectionModel} checkboxSelection={true} rowCount={500} columns={columns} rows={rows} paginationMode='server' paginationModel={paginationModel} onPaginationModelChange={onPaginationModelChange}/>);
+    <DataGrid
+       checkboxSelection={true}
+       keepNonExistentRowsSelected={true}
+       rowCount={props.rowCount}
+       rows={props.rows}
+       apiRef={apiRef}
+       columns={columns}
+       paginationMode='server'
+       paginationModel={paginationModel}
+       onPaginationModelChange={onPaginationModelChange}
+       onSortModelChange={onSortModelChange}
+       loading={false}
+       sortingMode='server'
+    />
     <Popover 
         anchorOrigin={{
             vertical: 'bottom',
@@ -51,10 +86,22 @@ export default function DogSearchResultsDataGrid() {
             vertical: 'top',
             horizontal: 'left',
         }} open={!!anchorEl}
-        anchorEl={anchorEl}>
+        anchorEl={anchorEl}
+    >
     The content of the Popover.
     </Popover>
     </>);
+}
 
+interface DogSearchResultsDataGridProps {
+    rows: GridRowsProp<Dog>;
+    rowCount: number;
+    onPaginationModelChange: (model: GridPaginationModel, details: GridCallbackDetails<any>) => void;
+    onSortModelChange: (model: GridSortModel, details: GridCallbackDetails<any>) => void;
+    ref: React.MutableRefObject<DogSearchResultsDataGridRef>;
+}
 
+export interface DogSearchResultsDataGridRef {
+    clearSelection: () => Promise<void>;
+    sortKey: keyof Dog |undefined;
 }

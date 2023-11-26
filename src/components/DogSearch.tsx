@@ -1,14 +1,17 @@
 import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Button, Stack } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 import DogLookup from "../api/data/DogLookup";
 import DogSearchResultTable from "./DogSearchResults/DogSearchResultTable";
-import DogSearchResultsDataGrid from "./DogSearchResults/DogSearchResultsDataGrid";
+import DogSearchResultsDataGrid, { DogSearchResultsDataGridRef } from "./DogSearchResults/DogSearchResultsDataGrid";
+import { GridPaginationModel, GridCallbackDetails, GridSortModel } from "@mui/x-data-grid";
+import React from "react";
 
 export default function DogSearch(props: dogSearchProps) {
     const [selectedBreed, setSelectedBreed] = useState<string>("");
     const [dogBreeds, setDogBreeds] = useState<string[]>([]);
     const resultGridStyle = useMemo(() => ({ height: '100%', width: '100%' } as React.CSSProperties), []);
     const resultContainerStyle = useMemo(() => ({ height: '25em', width: '100%' } as React.CSSProperties), []);
+    const ref = useRef<DogSearchResultsDataGridRef>();
 
 
     useEffect(() => {
@@ -40,7 +43,11 @@ export default function DogSearch(props: dogSearchProps) {
 
 </Stack>
 </FormControl>
-<DogSearchResultsDataGrid />
+<DogSearchResultsDataGrid rows={[]} rowCount={0} onPaginationModelChange={function (model: GridPaginationModel, details: GridCallbackDetails<any>): void {
+        throw new Error("Function not implemented.");
+      } } onSortModelChange={function (model: GridSortModel, details: GridCallbackDetails<any>): void {
+        throw new Error("Function not implemented.");
+      } } ref={ref} />
 </div>
 );
 }
