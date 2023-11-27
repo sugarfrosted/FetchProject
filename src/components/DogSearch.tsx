@@ -2,7 +2,7 @@ import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Button, S
 import { MutableRefObject, createRef, useEffect, useMemo, useRef, useState } from "react";
 import DogLookup from "../api/data/DogLookup";
 import DogSearchResultTable from "./DogSearchResults/DogSearchResultTable";
-import DogSearchResultsDataGrid, { DogSearchResultsDataGridRef } from "./DogSearchResults/DogSearchResultsDataGrid";
+import DogSearchResultsDataGrid, { DogSearchResultsDataGridProps2, DogSearchResultsDataGridRef } from "./DogSearchResults/DogSearchResultsDataGrid";
 import { GridPaginationModel, GridCallbackDetails, GridSortModel } from "@mui/x-data-grid";
 import React from "react";
 import { Dog } from "../api/shared/interfaces";
@@ -14,6 +14,10 @@ export default function DogSearch(props: dogSearchProps) {
     const resultContainerStyle = useMemo(() => ({ height: '25em', width: '100%' } as React.CSSProperties), []);
     const childRef = createRef<DogSearchResultsDataGridRef>();
 
+    function DogSearchResultsDataGridWrapper(props: DogSearchResultsDataGridProps2) {
+      return DogSearchResultsDataGrid(props, childRef);
+    }
+
 
     useEffect(() => {
         if(props.dogLookup) {
@@ -23,7 +27,7 @@ export default function DogSearch(props: dogSearchProps) {
           })}
     }, [props.dogLookup, props.dogLookup?.IsLoggedin])
 
-    
+
     return (<div>
         <FormControl >
 <Stack direction="row" spacing={2}>
@@ -44,14 +48,14 @@ export default function DogSearch(props: dogSearchProps) {
 
 </Stack>
 </FormControl>
-<DogSearchResultsDataGrid rows={[]} rowCount={0} onPaginationModelChange={function (model: GridPaginationModel, details: GridCallbackDetails<any>): void {
+<DogSearchResultsDataGridWrapper 
+      rows={[]} rowCount={0} onPaginationModelChange={function (model: GridPaginationModel, details: GridCallbackDetails<any>): void {
         throw new Error("Function not implemented.");
       } } onSortModelChange={function (model: GridSortModel, details: GridCallbackDetails<any>): void {
         throw new Error("Function not implemented.");
       } } dataLoadingHandler={function (sortkey: keyof Dog | undefined, sortOrder: SortDirection, page: number, pageSize: number): void {
         throw new Error("Function not implemented.");
       } }
-      ref = {childRef}
       />
 </div>
 );

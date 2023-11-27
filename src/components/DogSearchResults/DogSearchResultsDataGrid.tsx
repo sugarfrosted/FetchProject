@@ -83,6 +83,7 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
        onSortModelChange={onSortModelChange}
        loading={false}
        sortingMode='server'
+       autoHeight
     />
     <Popover 
         anchorOrigin={{
@@ -100,7 +101,9 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     </>);
 }
 
-interface DogSearchResultsDataGridProps2 {
+
+
+export interface DogSearchResultsDataGridProps2 {
     rows: GridRowsProp<Dog>;
     rowCount: number;
     onPaginationModelChange: (model: GridPaginationModel, details: GridCallbackDetails<any>) => void;
