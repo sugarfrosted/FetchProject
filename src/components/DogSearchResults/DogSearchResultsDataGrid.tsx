@@ -1,11 +1,11 @@
 import { Image } from '@mui/icons-material';
-import { Icon, IconButton, Popover } from '@mui/material';
+import { Icon, IconButton, Popover, SortDirection } from '@mui/material';
 import { DataGrid, GridCallbackDetails, GridColDef, GridInputRowSelectionModel, GridPaginationModel, GridRenderCellParams, GridRowId, GridRowsProp, GridSortModel, GridValueFormatterParams, useGridApiRef } from '@mui/x-data-grid';
-import { MouseEventHandler, useEffect, useState } from 'react';
+import { ForwardedRef, MouseEventHandler, useEffect, useImperativeHandle, useState } from 'react';
 import { Interface } from 'readline';
 import { Dog } from '../../api/shared/interfaces';
 
-export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps) {
+export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps2, ref: ForwardedRef<DogSearchResultsDataGridRef | undefined>) {
     const columns: GridColDef[] = [
         { field: 'name', headerName: 'Name', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, flex: 1 },
         { field: 'img', headerName: 'Image', sortable: false, hideable: false ,filterable: false, disableColumnMenu: true, renderCell: (data) => getDogImageAnchor(data) },
@@ -22,16 +22,22 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     const [sortKey, setSortKey] = useState<keyof Dog | undefined>();
     const apiRef = useGridApiRef();
 
-    useEffect(() => {
-        props.ref.current = {
-            clearSelection: async () => { return;},
-            sortKey: sortKey || 'name'
-        }
-    }, [props.ref])
+    useImperativeHandle(ref, () => ({
+        sortKey: sortKey || 'name',
+        clearSelection: async () => {},
+        loadSelection: async () => {},
+    }))
 
-    useEffect(() => { if(props.ref.current) {
-        props.ref.current.sortKey = sortKey;
-    }},[sortKey, props.ref.current]);
+    // useEffect(() => {
+    //     ref = {
+    //         clearSelection: async () => { return;},
+    //         sortKey: sortKey || 'name'
+    //     }
+    // }, [ref])
+
+    // useEffect(() => { if(ref.current) {
+    //     ref.current.sortKey = sortKey;
+    // }},[sortKey, ref.current]);
 
 
     function getDogImageAnchor(data: GridRenderCellParams) : any {
@@ -94,15 +100,21 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     </>);
 }
 
-interface DogSearchResultsDataGridProps {
+interface DogSearchResultsDataGridProps2 {
     rows: GridRowsProp<Dog>;
     rowCount: number;
     onPaginationModelChange: (model: GridPaginationModel, details: GridCallbackDetails<any>) => void;
     onSortModelChange: (model: GridSortModel, details: GridCallbackDetails<any>) => void;
-    ref: React.MutableRefObject<DogSearchResultsDataGridRef | undefined>;
+    dataLoadingHandler: (sortkey: keyof Dog | undefined, sortOrder: SortDirection, page: number, pageSize: number) => void;
+    // ref: React.MutableRefObject<DogSearchResultsDataGridRef | undefined>;
+}
+
+interface DogSearchResultsDataGridProps extends DogSearchResultsDataGridProps2 {
+    ref: any;
 }
 
 export interface DogSearchResultsDataGridRef {
     clearSelection: () => Promise<void>;
+    loadSelection: () => Promise<void>;
     sortKey: keyof Dog | undefined;
 }
