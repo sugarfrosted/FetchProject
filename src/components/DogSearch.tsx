@@ -8,7 +8,7 @@ import React from "react";
 import { Dog } from "../api/shared/interfaces";
 
 export default function DogSearch(props: dogSearchProps) {
-    const [selectedBreed, setSelectedBreed] = useState<string>("");
+    const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
     const [dogBreeds, setDogBreeds] = useState<string[]>([]);
     const resultGridStyle = useMemo(() => ({ height: '100%', width: '100%' } as React.CSSProperties), []);
     const resultContainerStyle = useMemo(() => ({ height: '25em', width: '100%' } as React.CSSProperties), []);
@@ -41,17 +41,28 @@ export default function DogSearch(props: dogSearchProps) {
 
     useEffect(() => {})
 
+  const handleChange = (event: SelectChangeEvent<typeof selectedBreeds>) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedBreeds(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value,
+    );
+  };
+
 
     return (<div>
         <FormControl >
 <Stack direction="row" spacing={2}>
-  <InputLabel id="lblSelectBreeds">Breed</InputLabel>
+  {/* <InputLabel id="lblSelectBreeds">Breed</InputLabel> */}
   <Select
     labelId="lblSelectBreeds"
-    sx={{minWidth: "20em"}}
+    multiple
+    autoWidth
     id="selSelectBreeds"
-    value={selectedBreed}
-    onChange={(event: SelectChangeEvent) => setSelectedBreed(event.target.value)}
+    value={selectedBreeds}
+    onChange={handleChange}
     label="Breed" 
     >
         {dogBreeds.map((x) => <MenuItem value={x} key={x}>{x}</MenuItem>)}
