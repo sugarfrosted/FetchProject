@@ -1,8 +1,8 @@
 import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Button, Stack, SortDirection } from "@mui/material";
 import { MutableRefObject, createRef, useEffect, useMemo, useRef, useState } from "react";
-import DogLookup from "../api/data/DogLookup";
+import DogLookup, { DogLookupParams } from "../api/data/DogLookup";
 import DogSearchResultTable from "./DogSearchResults/DogSearchResultTable";
-import DogSearchResultsDataGrid, { DogSearchResultsDataGridProps2, DogSearchResultsDataGridRef } from "./DogSearchResults/DogSearchResultsDataGrid";
+import DogSearchResultsDataGrid, { DogSearchResultsDataGridProps, DogSearchResultsDataGridRef } from "./DogSearchResults/DogSearchResultsDataGrid";
 import { GridPaginationModel, GridCallbackDetails, GridSortModel } from "@mui/x-data-grid";
 import React from "react";
 import { Dog } from "../api/shared/interfaces";
@@ -14,10 +14,22 @@ export default function DogSearch(props: dogSearchProps) {
     const resultContainerStyle = useMemo(() => ({ height: '25em', width: '100%' } as React.CSSProperties), []);
     const childRef = createRef<DogSearchResultsDataGridRef>();
 
-    function DogSearchResultsDataGridWrapper(props: DogSearchResultsDataGridProps2) {
+    /**
+     * Wrapper to get around the type issues surrounding passing references
+     * @param props 
+     * @returns 
+     */
+    function DogSearchResultsDataGridWrapper(props: DogSearchResultsDataGridProps) {
       return DogSearchResultsDataGrid(props, childRef);
     }
 
+    async function GetResultsHandler(params: DogLookupParams): Promise<{ dogs: Dog[]; total: number; } | undefined>
+    {
+      if (!props.dogLookup) {
+        return;
+      }
+      return await props.dogLookup.LoadDogs(params);
+    }
 
     useEffect(() => {
         if(props.dogLookup) {
@@ -26,6 +38,8 @@ export default function DogSearch(props: dogSearchProps) {
             setDogBreeds(breeds);
           })}
     }, [props.dogLookup, props.dogLookup?.IsLoggedin])
+
+    useEffect(() => {})
 
 
     return (<div>
@@ -49,13 +63,11 @@ export default function DogSearch(props: dogSearchProps) {
 </Stack>
 </FormControl>
 <DogSearchResultsDataGridWrapper 
-      rows={[]} rowCount={0} onPaginationModelChange={function (model: GridPaginationModel, details: GridCallbackDetails<any>): void {
+      onPaginationModelChange={function (model: GridPaginationModel, details: GridCallbackDetails<any>): void {
         throw new Error("Function not implemented.");
       } } onSortModelChange={function (model: GridSortModel, details: GridCallbackDetails<any>): void {
         throw new Error("Function not implemented.");
-      } } dataLoadingHandler={function (sortkey: keyof Dog | undefined, sortOrder: SortDirection, page: number, pageSize: number): void {
-        throw new Error("Function not implemented.");
-      } }
+      } } dataLoadingHandler={GetResultsHandler}
       />
 </div>
 );

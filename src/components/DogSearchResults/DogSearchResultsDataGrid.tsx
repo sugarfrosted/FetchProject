@@ -1,11 +1,12 @@
 import { Image } from '@mui/icons-material';
 import { Icon, IconButton, Popover, SortDirection } from '@mui/material';
-import { DataGrid, GridCallbackDetails, GridColDef, GridInputRowSelectionModel, GridPaginationModel, GridRenderCellParams, GridRowId, GridRowsProp, GridSortModel, GridValueFormatterParams, useGridApiRef } from '@mui/x-data-grid';
+import { DataGrid, GridCallbackDetails, GridColDef, GridInputRowSelectionModel, GridPaginationModel, GridRenderCellParams, GridRowId, GridRowsProp, GridSortModel, GridValueFormatterParams, daDK, useGridApiRef } from '@mui/x-data-grid';
 import { ForwardedRef, MouseEventHandler, useEffect, useImperativeHandle, useState } from 'react';
 import { Interface } from 'readline';
 import { Dog } from '../../api/shared/interfaces';
+import DogLookup, { DogLookupParams } from '../../api/data/DogLookup';
 
-export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps2, ref: ForwardedRef<DogSearchResultsDataGridRef | undefined>) {
+export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps, ref: ForwardedRef<DogSearchResultsDataGridRef | undefined>) {
     const columns: GridColDef[] = [
         { field: 'name', headerName: 'Name', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, flex: 1 },
         { field: 'img', headerName: 'Image', sortable: false, hideable: false ,filterable: false, disableColumnMenu: true, renderCell: (data) => getDogImageAnchor(data) },
@@ -20,13 +21,28 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
     const [anchorEl, setAnchorEl] = useState<Element|null>(null);
     const [sortKey, setSortKey] = useState<keyof Dog | undefined>();
+    const [sortModel, setSortModel] = useState();
     const apiRef = useGridApiRef();
+    const [rowCount, setRowCount] = useState(0);
+    const [rows, setRows] = useState<GridRowsProp<Dog>>([]);
 
     useImperativeHandle(ref, () => ({
         sortKey: sortKey || 'name',
         clearSelection: async () => {},
         loadSelection: async () => {},
     }))
+
+    function loadSelectionHandler() {
+        // Gather params
+        var params : DogLookupParams = {
+            sort: sortModel,
+            page: paginationModel.page,
+            size: paginationModel.pageSize,
+            filter: {},
+        }
+        
+        return props.dataLoadingHandler(params)
+    }
 
     // useEffect(() => {
     //     ref = {
@@ -73,8 +89,8 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     <DataGrid
        checkboxSelection={true}
        keepNonExistentRowsSelected={true}
-       rowCount={props.rowCount}
-       rows={props.rows}
+       rowCount={rowCount}
+       rows={rows}
        apiRef={apiRef}
        columns={columns}
        paginationMode='server'
@@ -83,6 +99,7 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
        onSortModelChange={onSortModelChange}
        loading={false}
        sortingMode='server'
+       sortModel={sortModel}
        autoHeight
     />
     <Popover 
@@ -103,17 +120,10 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
 
 
-export interface DogSearchResultsDataGridProps2 {
-    rows: GridRowsProp<Dog>;
-    rowCount: number;
+export interface DogSearchResultsDataGridProps {
     onPaginationModelChange: (model: GridPaginationModel, details: GridCallbackDetails<any>) => void;
     onSortModelChange: (model: GridSortModel, details: GridCallbackDetails<any>) => void;
-    dataLoadingHandler: (sortkey: keyof Dog | undefined, sortOrder: SortDirection, page: number, pageSize: number) => void;
-    // ref: React.MutableRefObject<DogSearchResultsDataGridRef | undefined>;
-}
-
-interface DogSearchResultsDataGridProps extends DogSearchResultsDataGridProps2 {
-    ref: any;
+    dataLoadingHandler: (params: DogLookupParams) => Promise<{ dogs: Dog[]; total: number; } | undefined>;
 }
 
 export interface DogSearchResultsDataGridRef {
