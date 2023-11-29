@@ -208,11 +208,12 @@ export interface dogParams
 {
     breeds?: string[];
     zipCodes?: string[];
-    ageMin?: number;
-    ageMax?: number;
+    ageMin?: number | undefined;
+    ageMax?: number | undefined;
     size?: number;
     from?: number;
-    sort?: number;
+    sort?: keyof Dog | undefined;
+    sortDirection?: 'asc' | 'desc' | undefined
 }
 
 export interface locationsParams
