@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Button, Stack, SortDirection } from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Button, Stack, SortDirection, Box, Chip } from "@mui/material";
 import { MutableRefObject, createRef, useEffect, useMemo, useRef, useState } from "react";
 import DogLookup, { DogLookupParams } from "../api/data/DogLookup";
 import DogSearchResultTable from "./DogSearchResults/DogSearchResultTable";
@@ -13,6 +13,14 @@ export default function DogSearch(props: dogSearchProps) {
     const resultGridStyle = useMemo(() => ({ height: '100%', width: '100%' } as React.CSSProperties), []);
     const resultContainerStyle = useMemo(() => ({ height: '25em', width: '100%' } as React.CSSProperties), []);
     const childRef = createRef<DogSearchResultsDataGridRef>();
+const MenuProps = {
+  PaperProps: {
+    style: {
+      // maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
     /**
      * Wrapper to get around the type issues surrounding passing references
@@ -25,6 +33,7 @@ export default function DogSearch(props: dogSearchProps) {
 
     async function GetResultsHandler(params: DogLookupParams): Promise<{ dogs: Dog[]; total: number; } | undefined>
     {
+      console.log("help")
       if (!props.dogLookup) {
         return;
       }
@@ -52,27 +61,29 @@ export default function DogSearch(props: dogSearchProps) {
   };
 
 
-    return (<div>
-        <FormControl >
-<Stack direction="row" spacing={2}>
-  {/* <InputLabel id="lblSelectBreeds">Breed</InputLabel> */}
-  <Select
-    labelId="lblSelectBreeds"
-    multiple
-    autoWidth
-    id="selSelectBreeds"
-    value={selectedBreeds}
-    onChange={handleChange}
-    label="Breed" 
-    >
-        {dogBreeds.map((x) => <MenuItem value={x} key={x}>{x}</MenuItem>)}
-  </Select>
-  <Button>Filter to Selected Breed</Button>
-  <Button>View All Breeds</Button>
+    return (
+      <div>
+  <FormControl sx={{ m: 1, width: "100%", mt: 3 }}>
+    <InputLabel id="lblSelectBreeds" >Breed</InputLabel>
+    <Select
+      labelId="lblSelectBreeds"
+      multiple
+      id="selSelectBreeds"
+      value={selectedBreeds}
+      onChange={handleChange}
+      label="Breed" 
+      renderValue={renderBreeds}
+      MenuProps={MenuProps}
+      >
+          {dogBreeds.map((x) => <MenuItem value={x} key={x}>{x}</MenuItem>)}
+    </Select>
+</FormControl>
+  <Stack direction={"column"}>
+  <Button onClick={childRef.current?.loadSelection}>View Selected</Button>
+  <Button onClick={() => setSelectedBreeds([])}>Clear Search</Button>
   
 
 </Stack>
-</FormControl>
 <DogSearchResultsDataGridWrapper 
       onPaginationModelChange={function (model: GridPaginationModel, details: GridCallbackDetails<any>): void {
         throw new Error("Function not implemented.");
@@ -80,8 +91,21 @@ export default function DogSearch(props: dogSearchProps) {
         throw new Error("Function not implemented.");
       } } dataLoadingHandler={GetResultsHandler}
       />
-</div>
+      </div>
 );
+
+  function renderBreeds(): React.ReactNode {
+    // if (selectedBreeds.length === 0) {
+    //   return <Box><em>Placeholder</em></Box>
+    // }
+      return (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+          {selectedBreeds.map((value) => (
+            <Chip key={value} label={value} />
+          ))}
+        </Box>
+      );
+    };
 }
 
 interface dogSearchProps

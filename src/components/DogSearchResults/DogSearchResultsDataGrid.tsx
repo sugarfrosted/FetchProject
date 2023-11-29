@@ -29,10 +29,15 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     useImperativeHandle(ref, () => ({
         sortKey: sortKey || 'name',
         clearSelection: async () => {},
-        loadSelection: async () => {},
+        loadSelection: async () => {
+            console.log("dogs")
+            var dogsSearchResults = await loadSelectionHandler();
+            setRows(dogsSearchResults?.dogs || [])
+            setRowCount(dogsSearchResults?.total || 0);
+        },
     }))
 
-    function loadSelectionHandler() {
+    async function loadSelectionHandler() {
         // Gather params
         var params : DogLookupParams = {
             sort: sortModel,
@@ -41,15 +46,8 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
             filter: {},
         }
         
-        return props.dataLoadingHandler(params)
+        return await props.dataLoadingHandler(params)
     }
-
-    // useEffect(() => {
-    //     ref = {
-    //         clearSelection: async () => { return;},
-    //         sortKey: sortKey || 'name'
-    //     }
-    // }, [ref])
 
     // useEffect(() => { if(ref.current) {
     //     ref.current.sortKey = sortKey;
