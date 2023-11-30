@@ -22,6 +22,6 @@ export default class Authorization {
 
     public async Logout(): Promise<void>
     {
-        return this._api.Post_Auth_Logout();
+        return this._api.Post_Auth_Logout().catch(); // send logout message!
     }
 }

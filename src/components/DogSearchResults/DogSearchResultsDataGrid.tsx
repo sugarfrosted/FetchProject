@@ -1,12 +1,13 @@
 import { Image } from '@mui/icons-material';
 import { Icon, IconButton, Popover, SortDirection } from '@mui/material';
-import { DataGrid, GridCallbackDetails, GridColDef, GridInputRowSelectionModel, GridPaginationModel, GridRenderCellParams, GridRowId, GridRowsProp, GridSortModel, GridValueFormatterParams, daDK, useGridApiRef } from '@mui/x-data-grid';
+import { DataGrid, GridCallbackDetails, GridColDef, GridInputRowSelectionModel, GridPagination, GridPaginationModel, GridRenderCellParams, GridRowId, GridRowSelectionModel, GridRowsProp, GridSortModel, GridValueFormatterParams, daDK, useGridApiRef } from '@mui/x-data-grid';
 import { ForwardedRef, MouseEventHandler, useEffect, useImperativeHandle, useState } from 'react';
 import { Interface } from 'readline';
 import { Dog } from '../../api/shared/interfaces';
-import DogLookup, { DogLookupParams } from '../../api/data/DogLookup';
+import DogLookup, { DogLookupFilter, DogLookupParams } from '../../api/data/DogLookup';
+import { GridApiCommunity } from '@mui/x-data-grid/internals';
 
-export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps, ref: ForwardedRef<DogSearchResultsDataGridRef | undefined>) {
+export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps) {
     const columns: GridColDef[] = [
         { field: 'name', headerName: 'Name', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, flex: 1 },
         { field: 'img', headerName: 'Image', sortable: false, hideable: false ,filterable: false, disableColumnMenu: true, renderCell: (data) => getDogImageAnchor(data) },
@@ -20,34 +21,27 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     };
 
     const [anchorEl, setAnchorEl] = useState<Element|null>(null);
-    const [sortKey, setSortKey] = useState<keyof Dog | undefined>();
-    const [sortModel, setSortModel] = useState();
+    const [pageModel, setPageModel] = useState<GridPaginationModel>({page: 0, pageSize: 25});
     const apiRef = useGridApiRef();
-    const [rowCount, setRowCount] = useState(0);
-    const [rows, setRows] = useState<GridRowsProp<Dog>>([]);
+    // const [rowCount, setRowCount] = useState(0);
+    // const [rows, setRows] = useState<GridRowsProp<Dog>>([]);
 
-    useImperativeHandle(ref, () => ({
-        sortKey: sortKey || 'name',
-        clearSelection: async () => {},
-        loadSelection: async () => {
-            console.log("dogs")
-            var dogsSearchResults = await loadSelectionHandler();
-            setRows(dogsSearchResults?.dogs || [])
-            setRowCount(dogsSearchResults?.total || 0);
-        },
-    }))
+    useEffect(() => {
+        onFilterModelChange(props.filterModel || {});
+    }, [props.filterModel])
 
-    async function loadSelectionHandler() {
-        // Gather params
-        var params : DogLookupParams = {
-            sort: sortModel,
-            page: paginationModel.page,
-            size: paginationModel.pageSize,
-            filter: {},
-        }
+
+    // async function loadSelectionHandler() {
+    //     // Gather params
+    //     var params : DogLookupParams = {
+    //         sort: sortModel,
+    //         page: paginationModel.page,
+    //         size: paginationModel.pageSize,
+    //         filter: {},
+    //     }
         
-        return await props.dataLoadingHandler(params)
-    }
+    //     return await props.dataLoadingHandler(params)
+    // }
 
     // useEffect(() => { if(ref.current) {
     //     ref.current.sortKey = sortKey;
@@ -70,7 +64,24 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
      * @param details 
      */
     function onPaginationModelChange(model: GridPaginationModel, details: GridCallbackDetails<any>): void {
-        console.log(model); console.log(details);
+        
+    }
+
+    async function onFilterModelChange(model: DogLookupFilter)
+    {
+        await clearSortModel();
+        await setToFirstPage();
+        if (props.onFilterModelChange) {
+            await props.onFilterModelChange(model, pageModel, apiRef)
+        }
+    }
+
+    async function clearSortModel() {
+        apiRef.current.setSortModel([]);
+    }
+
+    async function setToFirstPage() {
+        apiRef.current.setPage(0);
     }
 
 
@@ -87,17 +98,16 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     <DataGrid
        checkboxSelection={true}
        keepNonExistentRowsSelected={true}
-       rowCount={rowCount}
-       rows={rows}
+       rowCount={props.rowCount}
+       rows={props.rows}
        apiRef={apiRef}
        columns={columns}
        paginationMode='server'
-       paginationModel={paginationModel}
-       onPaginationModelChange={onPaginationModelChange}
-       onSortModelChange={onSortModelChange}
+       onPaginationModelChange={props.onPaginationModelChange}
+       onSortModelChange={props.onSortModelChange}
+       paginationModel={pageModel}
        loading={false}
        sortingMode='server'
-       sortModel={sortModel}
        autoHeight
     />
     <Popover 
@@ -116,16 +126,18 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     </>);
 }
 
+// update filter: clear the paging state to default. Clear the sort state and set to default.
+// update paging: don't change anything else.
+// update sort: clear the paging state and set to default
+
 
 
 export interface DogSearchResultsDataGridProps {
-    onPaginationModelChange: (model: GridPaginationModel, details: GridCallbackDetails<any>) => void;
-    onSortModelChange: (model: GridSortModel, details: GridCallbackDetails<any>) => void;
-    dataLoadingHandler: (params: DogLookupParams) => Promise<{ dogs: Dog[]; total: number; } | undefined>;
-}
-
-export interface DogSearchResultsDataGridRef {
-    clearSelection: () => Promise<void>;
-    loadSelection: () => Promise<void>;
-    sortKey: keyof Dog | undefined;
+    onPaginationModelChange?: (model: GridPaginationModel, details: GridCallbackDetails<any>) => void;
+    onSortModelChange?: (model: GridSortModel, details: GridCallbackDetails<any>) => void;
+    onFilterModelChange?: (model: DogLookupFilter, pageModel: any, apiRef: React.MutableRefObject<GridApiCommunity>) => void;
+    rows: GridRowsProp<Dog>;
+    rowCount: number;
+    selection?: GridRowSelectionModel;
+    filterModel?: DogLookupFilter;
 }

@@ -1,35 +1,30 @@
 import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Button, Stack, SortDirection, Box, Chip } from "@mui/material";
 import { MutableRefObject, createRef, useEffect, useMemo, useRef, useState } from "react";
-import DogLookup, { DogLookupParams } from "../api/data/DogLookup";
+import DogLookup, { DogLookupFilter, DogLookupParams } from "../api/data/DogLookup";
 import DogSearchResultTable from "./DogSearchResults/DogSearchResultTable";
-import DogSearchResultsDataGrid, { DogSearchResultsDataGridProps, DogSearchResultsDataGridRef } from "./DogSearchResults/DogSearchResultsDataGrid";
+import DogSearchResultsDataGrid, { DogSearchResultsDataGridProps } from "./DogSearchResults/DogSearchResultsDataGrid";
 import { GridPaginationModel, GridCallbackDetails, GridSortModel } from "@mui/x-data-grid";
 import React from "react";
 import { Dog } from "../api/shared/interfaces";
+import { GridApiCommunity } from "@mui/x-data-grid/internals";
+import DogBreedDropdown from "./DogSearchResults/DogBreedDropdown";
 
 export default function DogSearch(props: dogSearchProps) {
     const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
     const [dogBreeds, setDogBreeds] = useState<string[]>([]);
     const resultGridStyle = useMemo(() => ({ height: '100%', width: '100%' } as React.CSSProperties), []);
     const resultContainerStyle = useMemo(() => ({ height: '25em', width: '100%' } as React.CSSProperties), []);
-    const childRef = createRef<DogSearchResultsDataGridRef>();
-const MenuProps = {
-  PaperProps: {
-    style: {
-      // maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-    /**
-     * Wrapper to get around the type issues surrounding passing references
-     * @param props 
-     * @returns 
-     */
-    function DogSearchResultsDataGridWrapper(props: DogSearchResultsDataGridProps) {
-      return DogSearchResultsDataGrid(props, childRef);
-    }
+    const [activeFilter, setActiveFilter] = useState<DogLookupFilter>({})
+    const [rows, setRows] = useState<Dog[]>([])
+    const [rowCount, setRowCount] = useState<number>(0)
+    const MenuProps = {
+      PaperProps: {
+        style: {
+          // maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+          width: 250,
+        },
+      },
+    };
 
     async function GetResultsHandler(params: DogLookupParams): Promise<{ dogs: Dog[]; total: number; } | undefined>
     {
@@ -48,64 +43,71 @@ const MenuProps = {
           })}
     }, [props.dogLookup, props.dogLookup?.IsLoggedin])
 
-    useEffect(() => {})
+    useEffect(() => {}, [activeFilter])
 
-  const handleChange = (event: SelectChangeEvent<typeof selectedBreeds>) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedBreeds(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
-  };
+  function LoadDogs(apiRef: React.MutableRefObject<GridApiCommunity>, pageModel: any, filter?: DogLookupFilter | undefined | null) {
+    var queryParams: DogLookupParams = {};
+    if (filter) {
+      queryParams.filter = filter;
+    }
+    var sortModel = apiRef.current.getSortModel()
+    if (sortModel && sortModel.length > 0) {
+      queryParams.sort = sortModel;
+    }
+
+    queryParams.size = pageModel.size;
+    queryParams.page = pageModel.page;
+
+    if(props.dogLookup) {
+      props.dogLookup.LoadDogs(queryParams).then(result => {
+        setRows(result.dogs);
+        setRowCount(result.total);
+      });
+    }
+  }
+
+  function updateFilter() {
+    var filter: DogLookupFilter = {}
+    if (selectedBreeds && selectedBreeds.length > 0)
+    {
+      filter.breeds = selectedBreeds;
+    }
+
+    setActiveFilter(filter);
+  }
 
 
-    return (
-      <div>
-  <FormControl sx={{ m: 1, width: "100%", mt: 3 }}>
-    <InputLabel id="lblSelectBreeds" >Breed</InputLabel>
-    <Select
-      labelId="lblSelectBreeds"
-      multiple
-      id="selSelectBreeds"
-      value={selectedBreeds}
-      onChange={handleChange}
-      label="Breed" 
-      renderValue={renderBreeds}
-      MenuProps={MenuProps}
-      >
-          {dogBreeds.map((x) => <MenuItem value={x} key={x}>{x}</MenuItem>)}
-    </Select>
-</FormControl>
-  <Stack direction={"column"}>
-  <Button onClick={childRef.current?.loadSelection}>View Selected</Button>
-  <Button onClick={() => setSelectedBreeds([])}>Clear Search</Button>
+
+  return (
+    <div>
+      <DogBreedDropdown sx={{ m: 1, width: "100%", mt: 3 }} dogBreeds={dogBreeds} selectedBreeds={selectedBreeds} menuProps={MenuProps}/>
+      <Stack direction={"column"}>
+        {/* <Button onClick={LoadDogs} >Load Search</Button> */}
+        <Button onClick={() => {updateFilter()}}>Update Filter</Button>
+        <Button onClick={() => {setSelectedBreeds([])}}>Clear Search</Button>
+        {/* <Button onClick={updateFilter}>Update Filter</Button> */}
   
-
-</Stack>
-<DogSearchResultsDataGridWrapper 
-      onPaginationModelChange={function (model: GridPaginationModel, details: GridCallbackDetails<any>): void {
-        throw new Error("Function not implemented.");
-      } } onSortModelChange={function (model: GridSortModel, details: GridCallbackDetails<any>): void {
-        throw new Error("Function not implemented.");
-      } } dataLoadingHandler={GetResultsHandler}
-      />
+      </Stack>
+      <DogSearchResultsDataGrid 
+        onPaginationModelChange={function (model: GridPaginationModel, details: GridCallbackDetails<any>): void {
+          throw new Error("Function not implemented.");
+          } } onSortModelChange={onSortModelChange} onFilterModelChange={onFilterModelChanged} rows={rows} rowCount={rowCount} filterModel={activeFilter}/>
       </div>
 );
 
-  function renderBreeds(): React.ReactNode {
-    // if (selectedBreeds.length === 0) {
-    //   return <Box><em>Placeholder</em></Box>
-    // }
-      return (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-          {selectedBreeds.map((value) => (
-            <Chip key={value} label={value} />
-          ))}
-        </Box>
-      );
-    };
+//function loadFromCursor(url:) {}
+
+function onSortModelChange(model: GridSortModel, details: GridCallbackDetails<any>): void {
+  // Reflect outside or use API
+  console.log(model);
+  console.log(details);
+}
+  function onFilterModelChanged(model: DogLookupFilter, pageModel: any, gridApiRef: any): void {
+    console.log("filtermodel changed")
+    console.log(model);
+    LoadDogs(gridApiRef, pageModel, model);
+  }
+
 }
 
 interface dogSearchProps
