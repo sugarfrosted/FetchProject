@@ -107,14 +107,16 @@ export default class DogLookup {
 
 }
 
+export interface DogLookupFilter {
+    zipCodes?: string[] | undefined;
+    breeds?: string[] | undefined;
+    ageMax?: number | undefined;
+    ageMin?: number | undefined;
+}
+
 export interface DogLookupParams
 {
-    filter?: {
-        zipCodes?: string[]| undefined,
-        breeds?: string[] | undefined,
-        ageMax?: number | undefined,
-        ageMin?: number | undefined,
-    };
+    filter?: DogLookupFilter;
     sort?: GridSortModel | undefined;
     size?: number | undefined,
     page?: number | undefined
