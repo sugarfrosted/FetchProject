@@ -187,6 +187,15 @@ export default class DogFetchInverviewApi {
         return response.data;
     }
 
+    public async Run_Get_Query(request: string)
+    {
+        if (request.match(/^\/dogs\/search\?/i))
+        {
+            var result = await this.axiosInstance.get(request);
+
+        }
+    }
+
     private isRequestSuccessful(request: AxiosResponse<any, any>) {
         if (request.status === 401)
         {
