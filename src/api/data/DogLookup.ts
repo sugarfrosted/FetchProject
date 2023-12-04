@@ -1,5 +1,5 @@
 import DogFetchInterviewApi, { dogParams } from "../shared/DogFetchInterviewApi";
-import { Dog } from "../shared/interfaces";
+import { Dog, DogsSearchResult } from "../shared/interfaces";
 import { GridSortModel } from "@mui/x-data-grid";
 
 export default class DogLookup {
@@ -31,16 +31,35 @@ export default class DogLookup {
         }
     }
 
-    public async LoadDogs(params: DogLookupParams): Promise<{ dogs: Dog[]; total: number; }> {
-        var queryParams = this.getDogSearchQueryParams(params);
+    public async LoadDogs(params: DogLookupParams): Promise<combinedQueryResult> {
+        var queryParams = DogLookup.getDogSearchQueryParams(params);
         var searchResult = await this._api.Get_Dogs_Search(queryParams);
         var dogs = await this._api.Post_Dogs(searchResult.resultIds)
-        var lookupResult = {dogs: dogs || [], total: searchResult.total}
+        var lookupResult = DogLookup.unPackResult(dogs, searchResult)
 
         return lookupResult;
     }
 
-    private getDogSearchQueryParams(params: DogLookupParams): dogParams
+    public async LoadDogsFromQuery(query: string): Promise<{ dogs: Dog[]; total: number; nextQuery?: string | undefined; prevQuery?: string | undefined }>
+    {
+        var searchResult = await this._api.Run_Get_Query(query);
+        var dogs = await this._api.Post_Dogs(searchResult.resultIds);
+        var lookupResult = {dogs: dogs || [], total: searchResult.total};
+
+        return lookupResult;
+    }
+
+
+    private static unPackResult(dogs: Dog[], searchResult: DogsSearchResult) {
+
+        var combinedResult = { dogs: dogs || [], total: searchResult.total } as combinedQueryResult;
+        if (searchResult.next) combinedResult.next = searchResult.next;
+        if (searchResult.prev) combinedResult.prev = searchResult.prev;
+
+        return combinedResult;
+    }
+
+    private static getDogSearchQueryParams(params: DogLookupParams): dogParams
     {
         var queryParams : dogParams = {};
         if (params.filter) {
@@ -63,12 +82,8 @@ export default class DogLookup {
             }
         }
 
-        // We don't support multisort, but the grid api assumes it.
-        let sortItem = this.getDogSort(params.sort);
-        if (sortItem)
-        {
-            queryParams.sort = sortItem.field as keyof Dog;
-            if (sortItem.sort) queryParams.sortDirection = sortItem.sort;
+        if (params.sort) {
+            queryParams.sort = DogLookup.getDogSort(params.sort)
         }
 
         if (params.size)
@@ -87,21 +102,13 @@ export default class DogLookup {
 
     }
 
-    /** This is basically impossible to find documentation for. I suspect this is overkill but I don't know how to do it otherwise! :( */
-    private getDogSort(sort: GridSortModel | undefined) 
+    private static getDogSort(sort: GridSortModel | undefined) : string
     {
-        if (!sort || !sort.length)
-        {
-            return undefined;
-        }
+        var activeSort = (sort || []).find(x => { return ["img", "name", "age", "zip_code", "breed"].findIndex(y => y == x.field) !== -1});
+        var field = activeSort?.field as keyof Dog || "breed";
+        var order = activeSort?.sort || 'asc';
 
-        var activeSort = sort.find(x => x.field in ["img", "name", "age", "zip_code", "breed"])
-        if (activeSort)
-        {
-            return activeSort;
-        }
-
-        return undefined;
+        return [field, order].join(":");
     }
 
 
@@ -121,3 +128,11 @@ export interface DogLookupParams
     size?: number | undefined,
     page?: number | undefined
 }
+
+
+type combinedQueryResult = {
+    dogs: Dog[];
+    total: number;
+    next?: string;
+    prev?: string;
+};

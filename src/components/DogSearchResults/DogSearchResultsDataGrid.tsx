@@ -1,10 +1,9 @@
 import { Image } from '@mui/icons-material';
-import { Icon, IconButton, Popover, SortDirection } from '@mui/material';
-import { DataGrid, GridCallbackDetails, GridColDef, GridInputRowSelectionModel, GridPagination, GridPaginationModel, GridRenderCellParams, GridRowId, GridRowSelectionModel, GridRowsProp, GridSortModel, GridValueFormatterParams, daDK, useGridApiRef } from '@mui/x-data-grid';
-import { ForwardedRef, MouseEventHandler, useEffect, useImperativeHandle, useState } from 'react';
-import { Interface } from 'readline';
+import { IconButton, Popover } from '@mui/material';
+import { DataGrid, GridCallbackDetails, GridColDef, GridPaginationModel, GridRenderCellParams, GridRowSelectionModel, GridRowsProp, GridSortModel, useGridApiRef } from '@mui/x-data-grid';
+import { MouseEventHandler, MutableRefObject, useEffect, useState } from 'react';
 import { Dog } from '../../api/shared/interfaces';
-import DogLookup, { DogLookupFilter, DogLookupParams } from '../../api/data/DogLookup';
+import { DogLookupFilter } from '../../api/data/DogLookup';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
 
 export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps) {
@@ -22,10 +21,10 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
     const [anchorEl, setAnchorEl] = useState<Element|null>(null);
     const [pageModel, setPageModel] = useState<GridPaginationModel>({page: 0, pageSize: 25});
+    const [isLoading, setIsLoading] = useState(false);
     const apiRef = useGridApiRef();
-    // const [rowCount, setRowCount] = useState(0);
-    // const [rows, setRows] = useState<GridRowsProp<Dog>>([]);
-
+    const [dogImageUrl, setDogImageUrl] = useState("");
+ 
     useEffect(() => {
         onFilterModelChange(props.filterModel || {});
     }, [props.filterModel])
@@ -49,31 +48,63 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
 
     function getDogImageAnchor(data: GridRenderCellParams) : any {
-        return <IconButton onMouseOver={imageMouseEventHandler} onMouseLeave={imageMouseEventHandler} onClick={imageMouseEventHandler}><Image/></IconButton>
+        return null;
+        var handlePopoverOpen = getHandlePopoverOpen(data.value)
+        return <IconButton onClick={handlePopoverOpen} onMouseLeave={handlePopoverClose}><Image/></IconButton>
     }
 
-    const imageMouseEventHandler: MouseEventHandler<HTMLButtonElement> = 
-        function ImageMouseEventHandler(event: React.MouseEvent<HTMLButtonElement>) {
-            console.log(event);
-        } 
-
+    const getHandlePopoverOpen = (url: string ) =>
+    {
+      return (event: React.MouseEvent<HTMLElement>) => {
+        setDogImageUrl(url);
+        setAnchorEl(event.currentTarget);
+      };
+    }
+    
+      const handlePopoverClose = () => {
+        //setAnchorEl(null);
+      };
 
     /**
      * Get the next or previous. Might need to see if this is a new load.
      * @param model 
      * @param details 
      */
-    function onPaginationModelChange(model: GridPaginationModel, details: GridCallbackDetails<any>): void {
+    async function onPaginationModelChange(model: GridPaginationModel, details: GridCallbackDetails<any>) {
+        if (isLoading)
+        {
+            return;
+        }
+
+
+        setIsLoading(true);
+        if (props.onPaginationModelChange)
+        {
+            let updatedPagingModel = await props.onPaginationModelChange(model, details, pageModel, apiRef);
+            setPageModel(updatedPagingModel);
+        }
+        setIsLoading(false);
         
+    }
+
+    async function onSelectionChange(model : GridRowSelectionModel, details: GridCallbackDetails<any>) {
+        console.log(details);
     }
 
     async function onFilterModelChange(model: DogLookupFilter)
     {
+        if (isLoading) {
+            return;
+        }
+
+        setIsLoading(true);
         await clearSortModel();
         await setToFirstPage();
         if (props.onFilterModelChange) {
             await props.onFilterModelChange(model, pageModel, apiRef)
         }
+        setIsLoading(false);
+        setPageModel({pageSize: pageModel.pageSize, page: 0})
     }
 
     async function clearSortModel() {
@@ -90,8 +121,16 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
      * @param model 
      * @param details 
     */
-    function onSortModelChange(model: GridSortModel, details: GridCallbackDetails<any>): void {
-        throw new Error('Function not implemented.');
+    async function onSortModelChange(model: GridSortModel, details: GridCallbackDetails<any>) {
+        if (isLoading) {
+            return;
+        }
+
+        setIsLoading(true);
+        if (props.onSortModelChange) {
+            await props.onSortModelChange(model, details, paginationModel)
+        }
+        setIsLoading(false);
     }
 
     return ( <>
@@ -103,10 +142,11 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
        apiRef={apiRef}
        columns={columns}
        paginationMode='server'
-       onPaginationModelChange={props.onPaginationModelChange}
-       onSortModelChange={props.onSortModelChange}
+       onPaginationModelChange={onPaginationModelChange}
+       onSortModelChange={onSortModelChange}
        paginationModel={pageModel}
-       loading={false}
+       onRowSelectionModelChange={onSelectionChange}
+       loading={isLoading}
        sortingMode='server'
        autoHeight
     />
@@ -133,9 +173,9 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
 
 export interface DogSearchResultsDataGridProps {
-    onPaginationModelChange?: (model: GridPaginationModel, details: GridCallbackDetails<any>) => void;
-    onSortModelChange?: (model: GridSortModel, details: GridCallbackDetails<any>) => void;
-    onFilterModelChange?: (model: DogLookupFilter, pageModel: any, apiRef: React.MutableRefObject<GridApiCommunity>) => void;
+    onPaginationModelChange?: (model: GridPaginationModel, details: GridCallbackDetails<any>, previousModel: GridPaginationModel, apiRef: MutableRefObject<GridApiCommunity>) => Promise<GridPaginationModel>;
+    onSortModelChange?: (model: GridSortModel, details: GridCallbackDetails<any>, paginationModel: GridPaginationModel) => Promise<void>;
+    onFilterModelChange?: (model: DogLookupFilter, pageModel: any, apiRef: React.MutableRefObject<GridApiCommunity>) => Promise<void>;
     rows: GridRowsProp<Dog>;
     rowCount: number;
     selection?: GridRowSelectionModel;
