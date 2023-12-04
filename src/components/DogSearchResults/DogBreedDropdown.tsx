@@ -2,21 +2,17 @@ import { Theme } from "@emotion/react";
 import { Delete } from "@mui/icons-material";
 import { FormControl, InputLabel, Select, MenuItem, MenuProps, Box, Chip, SelectChangeEvent, SxProps } from "@mui/material";
 import { GridDeleteIcon } from "@mui/x-data-grid";
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 
 export default function DogBreedDropdown(props: DogBreedDropdownProps) {
   const dogBreeds = useMemo(() => props.dogBreeds, [props.dogBreeds]);
 
-    const handleChange = (event: SelectChangeEvent<typeof props.selectedBreeds>) => {
-    const { target: { value }, } = event;
-    props.selectedBreeds = typeof value === 'string' ? value.split(',') : value;
-  };
 
   function renderBreeds(): React.ReactNode {
       return (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
           {props.selectedBreeds.map((value) => (
-            <Chip key={value} label={value} onDelete={(event) => {console.log(event)}}/>
+            <Chip key={value} label={value}/>
           ))}
         </Box>
       );
@@ -30,7 +26,7 @@ export default function DogBreedDropdown(props: DogBreedDropdownProps) {
             multiple
             id="selSelectBreeds"
             value={props.selectedBreeds}
-            onChange={handleChange}
+            onChange={props.handleChange}
             label="Breed" 
             renderValue={renderBreeds}
             MenuProps={props.menuProps}
@@ -42,7 +38,8 @@ export default function DogBreedDropdown(props: DogBreedDropdownProps) {
 
 interface DogBreedDropdownProps {
     dogBreeds: string[]
-    menuProps?: Partial<MenuProps> | undefined;
     selectedBreeds: string[];
-    sx?: SxProps<Theme> | undefined
+    menuProps?: Partial<MenuProps> | undefined;
+    sx?: SxProps<Theme> | undefined;
+    handleChange?: ((event: SelectChangeEvent<string[]>, child: ReactNode) => void) | undefined
 }

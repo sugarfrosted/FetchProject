@@ -24,8 +24,8 @@ export interface Dog {
 export interface DogsSearchResult {
     resultIds: string[];
     total: number;
-    next: any;
-    prev: any;
+    next?: string;
+    prev?: string;
 }
 
 export interface Match {

@@ -43,7 +43,7 @@ export default class DogFetchInverviewApi {
 
         if (request.status !== 200 && request.status !== 401)
         {
-            Promise.reject("Not successful.");
+            Promise.reject(request.status);
         }
 
         this.Name = name;
@@ -69,9 +69,9 @@ export default class DogFetchInverviewApi {
         this.Email = null;
         this.IsLoggedIn = false;
 
-        if (this.isRequestSuccessful(request))
+        if (!this.didRequestFail(request))
         {
-            Promise.reject("Not successful.");
+            Promise.reject(request);
         }
     }
 
@@ -93,9 +93,9 @@ export default class DogFetchInverviewApi {
                 url: '/dogs/breeds',
             }) as AxiosResponse<string[]>;
 
-        if (this.isRequestSuccessful(response))
+        if (!this.didRequestFail(response))
         {
-            Promise.reject("Not successful.")
+            Promise.reject(response)
         }
 
         return response.data || [];
@@ -110,9 +110,9 @@ export default class DogFetchInverviewApi {
                 params: params,
             }) as AxiosResponse<DogsSearchResult>;
 
-        if (this.isRequestSuccessful(response))
+        if (!this.didRequestFail(response))
         {
-            return Promise.reject('Not successful');
+            return Promise.reject(response);
         }
 
         return response.data;
@@ -128,9 +128,9 @@ export default class DogFetchInverviewApi {
             }
         ) as AxiosResponse<Dog[]>;
 
-        if (this.isRequestSuccessful(response))
+        if (!this.didRequestFail(response))
         {
-            return Promise.reject('Not successful.');
+            return Promise.reject(response);
         }
 
         return response.data || [];
@@ -145,9 +145,9 @@ export default class DogFetchInverviewApi {
                 data: dogsIds,
             }) as AxiosResponse<Match>;
 
-        if (this.isRequestSuccessful(response))
+        if (!this.didRequestFail(response))
         {
-            return Promise.reject('Not successful.');
+            return Promise.reject(response);
         }
 
         return response.data;
@@ -162,9 +162,9 @@ export default class DogFetchInverviewApi {
                 data: zipCodes,
             }) as AxiosResponse<Location[]>;
 
-        if (this.isRequestSuccessful(response))
+        if (!this.didRequestFail(response))
         {
-            return Promise.reject('Not successful.');
+            return Promise.reject(response);
         }
 
         return response.data || [];
@@ -179,9 +179,9 @@ export default class DogFetchInverviewApi {
                 data: params,
             }) as AxiosResponse<mapSearchResults>;
 
-        if (this.isRequestSuccessful(response))
+        if (!this.didRequestFail(response))
         {
-            return Promise.reject('Not successful.');
+            return Promise.reject(response);
         }
 
         return response.data;
@@ -189,21 +189,30 @@ export default class DogFetchInverviewApi {
 
     public async Run_Get_Query(request: string)
     {
-        if (request.match(/^\/dogs\/search\?/i))
+        if (!request.match(/^\/dogs\/search\?/i))
         {
-            var result = await this.axiosInstance.get(request);
-
+            return Promise.reject("Unsupported call.")
         }
+
+        var response = await this.axiosInstance.get(request);
+
+        if (this.didRequestFail(response))
+        {
+            return Promise.reject(response.status);
+        }
+
+        return response.data;
     }
 
-    private isRequestSuccessful(request: AxiosResponse<any, any>) {
+    private didRequestFail(request: AxiosResponse<any, any>) {
         if (request.status === 401)
         {
             this.Name = null;
             this.Email = null;
             this.IsLoggedIn = false;
         }
-        return request.status !== 200;
+        console.log(request.status)
+        return request.status !== 200 || request.status;
     }
 }
 
@@ -221,8 +230,7 @@ export interface dogParams
     ageMax?: number | undefined;
     size?: number;
     from?: number;
-    sort?: keyof Dog | undefined;
-    sortDirection?: 'asc' | 'desc' | undefined
+    sort?: string;
 }
 
 export interface locationsParams

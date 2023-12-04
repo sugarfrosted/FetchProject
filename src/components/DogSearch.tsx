@@ -1,10 +1,8 @@
-import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Button, Stack, SortDirection, Box, Chip } from "@mui/material";
-import { MutableRefObject, createRef, useEffect, useMemo, useRef, useState } from "react";
+import { SelectChangeEvent, Button, Stack } from "@mui/material";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import DogLookup, { DogLookupFilter, DogLookupParams } from "../api/data/DogLookup";
-import DogSearchResultTable from "./DogSearchResults/DogSearchResultTable";
-import DogSearchResultsDataGrid, { DogSearchResultsDataGridProps } from "./DogSearchResults/DogSearchResultsDataGrid";
+import DogSearchResultsDataGrid from "./DogSearchResults/DogSearchResultsDataGrid";
 import { GridPaginationModel, GridCallbackDetails, GridSortModel } from "@mui/x-data-grid";
-import React from "react";
 import { Dog } from "../api/shared/interfaces";
 import { GridApiCommunity } from "@mui/x-data-grid/internals";
 import DogBreedDropdown from "./DogSearchResults/DogBreedDropdown";
@@ -12,11 +10,12 @@ import DogBreedDropdown from "./DogSearchResults/DogBreedDropdown";
 export default function DogSearch(props: dogSearchProps) {
     const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
     const [dogBreeds, setDogBreeds] = useState<string[]>([]);
-    const resultGridStyle = useMemo(() => ({ height: '100%', width: '100%' } as React.CSSProperties), []);
-    const resultContainerStyle = useMemo(() => ({ height: '25em', width: '100%' } as React.CSSProperties), []);
     const [activeFilter, setActiveFilter] = useState<DogLookupFilter>({})
     const [rows, setRows] = useState<Dog[]>([])
     const [rowCount, setRowCount] = useState<number>(0)
+    const pagingQueries : MutableRefObject<PagingQueries> = useRef({});
+
+
     const MenuProps = {
       PaperProps: {
         style: {
@@ -25,15 +24,6 @@ export default function DogSearch(props: dogSearchProps) {
         },
       },
     };
-
-    async function GetResultsHandler(params: DogLookupParams): Promise<{ dogs: Dog[]; total: number; } | undefined>
-    {
-      console.log("help")
-      if (!props.dogLookup) {
-        return;
-      }
-      return await props.dogLookup.LoadDogs(params);
-    }
 
     useEffect(() => {
         if(props.dogLookup) {
@@ -45,25 +35,41 @@ export default function DogSearch(props: dogSearchProps) {
 
     useEffect(() => {}, [activeFilter])
 
-  function LoadDogs(apiRef: React.MutableRefObject<GridApiCommunity>, pageModel: any, filter?: DogLookupFilter | undefined | null) {
+  async function LoadDogs(sortModel: GridSortModel, pageModel: GridPaginationModel, filter?: DogLookupFilter | undefined | null) {
     var queryParams: DogLookupParams = {};
     if (filter) {
       queryParams.filter = filter;
     }
-    var sortModel = apiRef.current.getSortModel()
     if (sortModel && sortModel.length > 0) {
       queryParams.sort = sortModel;
     }
+    else {
+    }
 
-    queryParams.size = pageModel.size;
+    queryParams.size = pageModel.pageSize;
     queryParams.page = pageModel.page;
 
     if(props.dogLookup) {
-      props.dogLookup.LoadDogs(queryParams).then(result => {
+      await props.dogLookup.LoadDogs(queryParams).then(result => {
         setRows(result.dogs);
         setRowCount(result.total);
       });
     }
+  }
+
+  async function LoadDogsFromQuery(query: string)
+  {
+    if (!props.dogLookup)
+    {
+      return;
+    }
+
+    var queryResult = await props.dogLookup.LoadDogsFromQuery(query);
+
+    setRowCount(queryResult.total);
+    setRows(queryResult.dogs);
+    pagingQueries.current.next = queryResult.nextQuery;
+    pagingQueries.current.prev = queryResult.prevQuery;
   }
 
   function updateFilter() {
@@ -76,11 +82,19 @@ export default function DogSearch(props: dogSearchProps) {
     setActiveFilter(filter);
   }
 
+  const handleDogBreedDropdownChange = (event: SelectChangeEvent<typeof selectedBreeds>) => {
+    const { target: { value }, } = event;
+    setSelectedBreeds(typeof value === 'string' ? value.split(',') : value)
+  };
 
 
   return (
     <div>
-      <DogBreedDropdown sx={{ m: 1, width: "100%", mt: 3 }} dogBreeds={dogBreeds} selectedBreeds={selectedBreeds} menuProps={MenuProps}/>
+      <DogBreedDropdown sx={{ m: 1, width: "100%", mt: 3 }}
+        dogBreeds={dogBreeds}
+        selectedBreeds={selectedBreeds}
+        handleChange={handleDogBreedDropdownChange}
+        menuProps={MenuProps}/>
       <Stack direction={"column"}>
         {/* <Button onClick={LoadDogs} >Load Search</Button> */}
         <Button onClick={() => {updateFilter()}}>Update Filter</Button>
@@ -89,23 +103,65 @@ export default function DogSearch(props: dogSearchProps) {
   
       </Stack>
       <DogSearchResultsDataGrid 
-        onPaginationModelChange={function (model: GridPaginationModel, details: GridCallbackDetails<any>): void {
-          throw new Error("Function not implemented.");
-          } } onSortModelChange={onSortModelChange} onFilterModelChange={onFilterModelChanged} rows={rows} rowCount={rowCount} filterModel={activeFilter}/>
+        onPaginationModelChange={onPaginationModelChange} onSortModelChange={onSortModelChange} onFilterModelChange={onFilterModelChanged} rows={rows} rowCount={rowCount} filterModel={activeFilter}/>
       </div>
 );
 
 //function loadFromCursor(url:) {}
 
-function onSortModelChange(model: GridSortModel, details: GridCallbackDetails<any>): void {
-  // Reflect outside or use API
-  console.log(model);
-  console.log(details);
+async function onSortModelChange(model: GridSortModel, _details: GridCallbackDetails<any>, paginationModel: GridPaginationModel): Promise<void> {
+  
+  await LoadDogs(model, paginationModel ,activeFilter);
 }
-  function onFilterModelChanged(model: DogLookupFilter, pageModel: any, gridApiRef: any): void {
-    console.log("filtermodel changed")
-    console.log(model);
-    LoadDogs(gridApiRef, pageModel, model);
+
+async function onPaginationModelChange(model: GridPaginationModel, details: GridCallbackDetails<any>, previousModel: GridPaginationModel, gridApiRef: MutableRefObject<GridApiCommunity>): Promise<GridPaginationModel> {
+  var updatedModel: GridPaginationModel = model;
+  var pageSizeChanged = false;
+
+  if (!props.dogLookup)
+  {
+    return previousModel;
+  }
+
+  if (previousModel.pageSize !== model.pageSize) {
+    let updatedPageNumber = Math.floor(previousModel.pageSize * previousModel.page / model.pageSize)
+    updatedModel = {page: updatedPageNumber, pageSize : model.pageSize} as GridPaginationModel 
+    pageSizeChanged = true;
+  }
+
+  var pageDifference = updatedModel.page - previousModel.pageSize; 
+
+  if(!pageSizeChanged || pageDifference === 0)
+  {
+    return updatedModel;
+  }
+
+  var updatedData: Promise<void>
+
+  if (!pageSizeChanged && pageDifference === 1 && pagingQueries.current.next)
+  {
+    console.info(pagingQueries.current.next)
+    updatedData = LoadDogsFromQuery(pagingQueries.current.next);
+  }
+  else if (!pageSizeChanged && pageDifference === -1 && pagingQueries.current.prev)
+  {
+    console.info(pagingQueries.current.next)
+    updatedData = LoadDogsFromQuery(pagingQueries.current.prev);
+
+  }
+  else
+  {
+    updatedData = LoadDogs(gridApiRef.current.getSortModel(), updatedModel, activeFilter)
+  }
+  
+  await updatedData;
+
+  return updatedModel;
+}
+
+
+  async function onFilterModelChanged(model: DogLookupFilter, pageModel: GridPaginationModel, gridApiRef: MutableRefObject<GridApiCommunity>): Promise<void> {
+    LoadDogs(gridApiRef.current.getSortModel(), pageModel, model);
   }
 
 }
@@ -113,4 +169,10 @@ function onSortModelChange(model: GridSortModel, details: GridCallbackDetails<an
 interface dogSearchProps
 {
     dogLookup: DogLookup | null;
+}
+
+interface PagingQueries
+{
+  next?: string;
+  prev?: string;
 }
