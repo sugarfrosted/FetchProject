@@ -9,12 +9,14 @@ import DogSearch from './components/DogSearch';
 import Authorization from './api/auth/Authorization';
 import DogFetchInterviewApi from './api/shared/DogFetchInterviewApi';
 import DogLookup from './api/data/DogLookup';
+import { AuthContext, DogLookupContext } from './state/DogContext';
+import { SERVER_URL as baseURL} from './Connection.json'
 
 function App() {
   const [currentUserName, setCurrentUserName] = useState<string | null>(null);
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
   const [loginPaneOpen, setLoginPaneOpen] = useState(false);
-  const api = useMemo(() => { return new DogFetchInterviewApi(); }, [])
+  const api = useMemo(() => { return new DogFetchInterviewApi(baseURL); }, [])
 
   function onLoginSuccessHandler(name: string, email: string) : void
   {
@@ -27,28 +29,34 @@ function App() {
     setLoginPaneOpen(false);
   }
 
-  const logoutClickedHandler = async () => {
-    authLookup.Logout().then(() => {
-      setCurrentUserName(null);
-      setCurrentUserEmail(null);
-    });
-  };
+  // const logoutClickedHandler = async () => {
+  //   authLookup.Logout().then(() => {
+  //     setCurrentUserName(null);
+  //     setCurrentUserEmail(null);
+  //   });
+  // };
 
-  const loginClickedHandler = () => {
-    setLoginPaneOpen(true);
-  };
+  // const loginClickedHandler = () => {
+  //   setLoginPaneOpen(true);
+  // };
 
   var authLookup = new Authorization(api);
   var dogLookup = new DogLookup(api);
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <TopBar name={currentUserName} email={currentUserEmail} loginClickedHandler={loginClickedHandler} logoutClickedHandler={logoutClickedHandler}/>
-        <Container>
-          { currentUserName && currentUserEmail ? <DogSearch dogLookup={dogLookup} /> : <DogGreeting /> }
-        </Container>
-      <LoginPane onSuccess={onLoginSuccessHandler} onClose={onLoginCloseHandler} open={loginPaneOpen} loginLookup={authLookup} />
-    </Box>
+    <DogLookupContext.Provider value={dogLookup}>
+      <AuthContext.Provider value={authLookup} >
+        <Box sx={{ flexGrow: 1 }}>
+          <TopBar name={currentUserName} email={currentUserEmail}/>
+            <Container>
+              { currentUserName && currentUserEmail ? <DogSearch /> : <DogGreeting /> }
+            </Container>
+          <LoginPane onSuccess={onLoginSuccessHandler} onClose={onLoginCloseHandler} open={loginPaneOpen} />
+        </Box>
+      </AuthContext.Provider>
+    </DogLookupContext.Provider>
+
+
   );
 }
 

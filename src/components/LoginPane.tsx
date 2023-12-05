@@ -1,7 +1,8 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, setRef } from "@mui/material";
-import { ChangeEvent, useEffect, useRef, useState } from "react"
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react"
 import { validate as isValidEmail } from "email-validator";
-import Authorization from "../api/auth/Authorization";
+import { AuthContext } from "../state/DogContext";
+
 
 export default function LoginPane(params: loginPaneParams)
 {
@@ -10,6 +11,7 @@ export default function LoginPane(params: loginPaneParams)
     const [emailHasError, setEmailHasError] = useState(false);
     const [nameHasError, setNameHasError] = useState(false);
     const tfNameRef = useRef<HTMLDivElement>(null);
+    const loginLookup = useContext(AuthContext);
 
     useEffect(() => {
       setName("");
@@ -23,12 +25,12 @@ export default function LoginPane(params: loginPaneParams)
         setNameHasError(!name);
         setEmailHasError(!isValidEmail(email));
 
-        if (nameHasError || emailHasError)
+        if (nameHasError || emailHasError || !loginLookup)
         {
             return;
         }
 
-        var loginAttempt = await params.loginLookup.Login(name, email);
+        var loginAttempt = await loginLookup.Login(name, email);
 
         if(!loginAttempt.isLoggedIn)
         {
@@ -112,6 +114,5 @@ export interface loginPaneParams {
     onSuccess?: ((name: string, email: string) => void) | undefined;
     onClose: () => void;
     open: boolean;
-    loginLookup: Authorization;
 }
 

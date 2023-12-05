@@ -75,8 +75,7 @@ export default class DogFetchInverviewApi {
         }
     }
 
-    constructor() {
-        const baseURL = "https://frontend-take-home-service.fetch.com"; // TODO: Move this to a configuration file
+    constructor(baseURL: string) {
         this.axiosInstance = axios.create({
             baseURL: baseURL,
             timeout: 1000,
