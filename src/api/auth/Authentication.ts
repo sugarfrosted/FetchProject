@@ -4,7 +4,7 @@ import DogFetchInterviewApi from '../shared/DogFetchInterviewApi';
 /**
  * Wrapper for the main Api. This is done for code organization.
  */
-export default class Authorization {
+export default class Authentication {
     public get UserName() { return this._api?.Name && null; }
     public get UserEmail() { return this._api?.Email && null; }
 

@@ -1,11 +1,14 @@
 import { AccountCircle, Logout } from "@mui/icons-material";
 import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem, Icon, Tooltip } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import Authentication from "../api/auth/Authentication";
+import { AuthContext } from "../state/DogContext";
 
 export default function TopBar(props : topBarProps)
 {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const authLookup = useContext(AuthContext);
 
   useEffect(() => { setIsLoggedIn(!!props?.name && !!props?.email) }, [props?.email, props.name]);
 
@@ -25,9 +28,9 @@ export default function TopBar(props : topBarProps)
   }
 
   const handleLogout = () => {
-    if (props.logoutClickedHandler)
+    if (props.logoutClickedHandler && authLookup)
     {
-      props.logoutClickedHandler();
+      props.logoutClickedHandler(authLookup);
     }
   };
 
@@ -94,5 +97,5 @@ interface topBarProps {
   name: string | null;
   email: string | null;
   loginClickedHandler?: (() => void) | undefined;
-  logoutClickedHandler?: (() => void) | undefined;
+  logoutClickedHandler?: ((auth: Authentication) => void) | undefined;
 }
