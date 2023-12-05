@@ -40,11 +40,11 @@ export default class DogLookup {
         return lookupResult;
     }
 
-    public async LoadDogsFromQuery(query: string): Promise<{ dogs: Dog[]; total: number; nextQuery?: string | undefined; prevQuery?: string | undefined }>
+    public async LoadDogsFromQuery(query: string): Promise<combinedQueryResult>
     {
         var searchResult = await this._api.Run_Get_Query(query);
         var dogs = await this._api.Post_Dogs(searchResult.resultIds);
-        var lookupResult = {dogs: dogs || [], total: searchResult.total};
+        var lookupResult = DogLookup.unPackResult(dogs, searchResult);
 
         return lookupResult;
     }
@@ -82,9 +82,7 @@ export default class DogLookup {
             }
         }
 
-        if (params.sort) {
-            queryParams.sort = DogLookup.getDogSort(params.sort)
-        }
+        queryParams.sort = DogLookup.getDogSort(params.sort)
 
         if (params.size)
         {
@@ -104,7 +102,7 @@ export default class DogLookup {
 
     private static getDogSort(sort: GridSortModel | undefined) : string
     {
-        var activeSort = (sort || []).find(x => { return ["img", "name", "age", "zip_code", "breed"].findIndex(y => y == x.field) !== -1});
+        var activeSort = (sort || []).find(sortItems => ["name", "age", "breed"].findIndex(key => key == sortItems.field) !== -1);
         var field = activeSort?.field as keyof Dog || "breed";
         var order = activeSort?.sort || 'asc';
 

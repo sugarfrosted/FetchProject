@@ -1,6 +1,6 @@
 import { createContext } from 'react';
-import DogFetchInterviewApi from '../api/shared/DogFetchInterviewApi';
+import DogLookup from '../api/data/DogLookup';
+import Authorization from '../api/auth/Authorization';
 
-const DogContext = createContext(new DogFetchInterviewApi());
-
-export default DogContext;
+export const DogLookupContext = createContext(null as DogLookup | null);
+export const AuthContext = createContext(null as Authorization | null);

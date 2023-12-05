@@ -1,7 +1,7 @@
 import { Image } from '@mui/icons-material';
 import { IconButton, Popover } from '@mui/material';
 import { DataGrid, GridCallbackDetails, GridColDef, GridPaginationModel, GridRenderCellParams, GridRowSelectionModel, GridRowsProp, GridSortModel, useGridApiRef } from '@mui/x-data-grid';
-import { MouseEventHandler, MutableRefObject, useEffect, useState } from 'react';
+import { MutableRefObject, useEffect, useState } from 'react';
 import { Dog } from '../../api/shared/interfaces';
 import { DogLookupFilter } from '../../api/data/DogLookup';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
@@ -11,13 +11,9 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
         { field: 'name', headerName: 'Name', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, flex: 1 },
         { field: 'img', headerName: 'Image', sortable: false, hideable: false ,filterable: false, disableColumnMenu: true, renderCell: (data) => getDogImageAnchor(data) },
         { field: 'age', headerName: 'Age', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, },
-        { field: 'zip_code', headerName: 'ZIP Code', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, },
+        { field: 'zip_code', headerName: 'ZIP Code', sortable: false, hideable: false ,filterable: false, disableColumnMenu: true, },
         { field: 'breed', headerName: 'Breed', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, flex: 1},
     ];
-    const paginationModel: GridPaginationModel = {
-        pageSize: 25,
-        page: 0,
-    };
 
     const [anchorEl, setAnchorEl] = useState<Element|null>(null);
     const [pageModel, setPageModel] = useState<GridPaginationModel>({page: 0, pageSize: 25});
@@ -48,9 +44,8 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
 
     function getDogImageAnchor(data: GridRenderCellParams) : any {
-        return null;
-        var handlePopoverOpen = getHandlePopoverOpen(data.value)
-        return <IconButton onClick={handlePopoverOpen} onMouseLeave={handlePopoverClose}><Image/></IconButton>
+        // var handlePopoverOpen = getHandlePopoverOpen(data.value)
+        // return <IconButton onClick={handlePopoverOpen} onMouseLeave={handlePopoverClose}><Image/></IconButton>
     }
 
     const getHandlePopoverOpen = (url: string ) =>
@@ -76,7 +71,6 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
             return;
         }
 
-
         setIsLoading(true);
         if (props.onPaginationModelChange)
         {
@@ -97,14 +91,20 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
             return;
         }
 
-        setIsLoading(true);
-        await clearSortModel();
-        await setToFirstPage();
-        if (props.onFilterModelChange) {
-            await props.onFilterModelChange(model, pageModel, apiRef)
+        try {
+            setIsLoading(true);
+            await clearSortModel();
+            await setToFirstPage();
+            if (props.onFilterModelChange) {
+                await props.onFilterModelChange(model, pageModel, apiRef)
+            }
+            setPageModel({pageSize: pageModel.pageSize, page: 0})
+        } catch (error) {
+            
         }
-        setIsLoading(false);
-        setPageModel({pageSize: pageModel.pageSize, page: 0})
+        finally {
+            setIsLoading(false);
+        }
     }
 
     async function clearSortModel() {
@@ -126,11 +126,18 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
             return;
         }
 
-        setIsLoading(true);
-        if (props.onSortModelChange) {
-            await props.onSortModelChange(model, details, paginationModel)
+        try {
+            setIsLoading(true);
+            if (props.onSortModelChange) {
+                await setToFirstPage();
+                await props.onSortModelChange(model, details, pageModel)
+            }
         }
-        setIsLoading(false);
+        catch { }
+        finally
+        {
+            setIsLoading(false);
+        }
     }
 
     return ( <>
@@ -149,6 +156,7 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
        loading={isLoading}
        sortingMode='server'
        autoHeight
+       pageSizeOptions={[5, 10, 25, 50]}
     />
     <Popover 
         anchorOrigin={{

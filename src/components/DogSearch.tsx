@@ -1,11 +1,12 @@
 import { SelectChangeEvent, Button, Stack } from "@mui/material";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { MutableRefObject, useContext, useEffect, useRef, useState } from "react";
 import DogLookup, { DogLookupFilter, DogLookupParams } from "../api/data/DogLookup";
 import DogSearchResultsDataGrid from "./DogSearchResults/DogSearchResultsDataGrid";
 import { GridPaginationModel, GridCallbackDetails, GridSortModel } from "@mui/x-data-grid";
 import { Dog } from "../api/shared/interfaces";
 import { GridApiCommunity } from "@mui/x-data-grid/internals";
 import DogBreedDropdown from "./DogSearchResults/DogBreedDropdown";
+import { DogLookupContext } from "../state/DogContext";
 
 export default function DogSearch(props: dogSearchProps) {
     const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
@@ -13,7 +14,9 @@ export default function DogSearch(props: dogSearchProps) {
     const [activeFilter, setActiveFilter] = useState<DogLookupFilter>({})
     const [rows, setRows] = useState<Dog[]>([])
     const [rowCount, setRowCount] = useState<number>(0)
-    const pagingQueries : MutableRefObject<PagingQueries> = useRef({});
+    const [nextPagingQuery, setNextPagingQuery] = useState<string | undefined>();
+    const [prevPagingQuery, setPrevPagingQuery] = useState<string | undefined>();
+    const dogLookup = useContext(DogLookupContext);
 
 
     const MenuProps = {
@@ -26,12 +29,12 @@ export default function DogSearch(props: dogSearchProps) {
     };
 
     useEffect(() => {
-        if(props.dogLookup) {
-          props.dogLookup.LoadDogBreeds().then(() => {
-            var breeds = props.dogLookup?.DogBreeds || [];
+        if(dogLookup) {
+          dogLookup.LoadDogBreeds().then(() => {
+            var breeds = dogLookup?.DogBreeds || [];
             setDogBreeds(breeds);
           })}
-    }, [props.dogLookup, props.dogLookup?.IsLoggedin])
+    }, [dogLookup, dogLookup?.IsLoggedin])
 
     useEffect(() => {}, [activeFilter])
 
@@ -49,27 +52,30 @@ export default function DogSearch(props: dogSearchProps) {
     queryParams.size = pageModel.pageSize;
     queryParams.page = pageModel.page;
 
-    if(props.dogLookup) {
-      await props.dogLookup.LoadDogs(queryParams).then(result => {
+    if(dogLookup) {
+      await dogLookup.LoadDogs(queryParams).then(result => {
         setRows(result.dogs);
         setRowCount(result.total);
+        setNextPagingQuery(result.next);
+        setPrevPagingQuery(result.prev);
       });
     }
   }
 
   async function LoadDogsFromQuery(query: string)
   {
-    if (!props.dogLookup)
+    console.log("dogs")
+    if (!dogLookup)
     {
       return;
     }
 
-    var queryResult = await props.dogLookup.LoadDogsFromQuery(query);
+    var queryResult = await dogLookup.LoadDogsFromQuery(query);
 
     setRowCount(queryResult.total);
     setRows(queryResult.dogs);
-    pagingQueries.current.next = queryResult.nextQuery;
-    pagingQueries.current.prev = queryResult.prevQuery;
+    setNextPagingQuery(queryResult.next);
+    setPrevPagingQuery(queryResult.prev);
   }
 
   function updateFilter() {
@@ -107,18 +113,17 @@ export default function DogSearch(props: dogSearchProps) {
       </div>
 );
 
-//function loadFromCursor(url:) {}
-
 async function onSortModelChange(model: GridSortModel, _details: GridCallbackDetails<any>, paginationModel: GridPaginationModel): Promise<void> {
-  
+
   await LoadDogs(model, paginationModel ,activeFilter);
 }
 
 async function onPaginationModelChange(model: GridPaginationModel, details: GridCallbackDetails<any>, previousModel: GridPaginationModel, gridApiRef: MutableRefObject<GridApiCommunity>): Promise<GridPaginationModel> {
+  console.log("external handler")
   var updatedModel: GridPaginationModel = model;
   var pageSizeChanged = false;
 
-  if (!props.dogLookup)
+  if (!dogLookup)
   {
     return previousModel;
   }
@@ -131,26 +136,26 @@ async function onPaginationModelChange(model: GridPaginationModel, details: Grid
 
   var pageDifference = updatedModel.page - previousModel.pageSize; 
 
-  if(!pageSizeChanged || pageDifference === 0)
+  if(!pageSizeChanged && pageDifference === 0)
   {
     return updatedModel;
   }
 
   var updatedData: Promise<void>
 
-  if (!pageSizeChanged && pageDifference === 1 && pagingQueries.current.next)
+  if (!pageSizeChanged && pageDifference === 1 && nextPagingQuery)
   {
-    console.info(pagingQueries.current.next)
-    updatedData = LoadDogsFromQuery(pagingQueries.current.next);
+    console.log("a")
+    updatedData = LoadDogsFromQuery(nextPagingQuery);
   }
-  else if (!pageSizeChanged && pageDifference === -1 && pagingQueries.current.prev)
+  else if (!pageSizeChanged && pageDifference === -1 && prevPagingQuery)
   {
-    console.info(pagingQueries.current.next)
-    updatedData = LoadDogsFromQuery(pagingQueries.current.prev);
-
+    console.log("b")
+    updatedData = LoadDogsFromQuery(prevPagingQuery);
   }
   else
   {
+    console.log("c")
     updatedData = LoadDogs(gridApiRef.current.getSortModel(), updatedModel, activeFilter)
   }
   
@@ -168,11 +173,4 @@ async function onPaginationModelChange(model: GridPaginationModel, details: Grid
 
 interface dogSearchProps
 {
-    dogLookup: DogLookup | null;
-}
-
-interface PagingQueries
-{
-  next?: string;
-  prev?: string;
 }
