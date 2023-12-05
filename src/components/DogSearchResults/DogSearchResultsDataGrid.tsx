@@ -22,25 +22,8 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     const [dogImageUrl, setDogImageUrl] = useState("");
  
     useEffect(() => {
-        onFilterModelChange(props.filterModel || {});
+        onFilterModelChange(props.filterModel);
     }, [props.filterModel])
-
-
-    // async function loadSelectionHandler() {
-    //     // Gather params
-    //     var params : DogLookupParams = {
-    //         sort: sortModel,
-    //         page: paginationModel.page,
-    //         size: paginationModel.pageSize,
-    //         filter: {},
-    //     }
-        
-    //     return await props.dataLoadingHandler(params)
-    // }
-
-    // useEffect(() => { if(ref.current) {
-    //     ref.current.sortKey = sortKey;
-    // }},[sortKey, ref.current]);
 
 
     function getDogImageAnchor(data: GridRenderCellParams) : any {
@@ -74,15 +57,11 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
         setIsLoading(true);
         if (props.onPaginationModelChange)
         {
-            let updatedPagingModel = await props.onPaginationModelChange(model, details, pageModel, apiRef);
+            let updatedPagingModel = await props.onPaginationModelChange(model, details, pageModel, apiRef.current.getSortModel());
             setPageModel(updatedPagingModel);
         }
         setIsLoading(false);
         
-    }
-
-    async function onSelectionChange(model : GridRowSelectionModel, details: GridCallbackDetails<any>) {
-        console.log(details);
     }
 
     async function onFilterModelChange(model: DogLookupFilter)
@@ -152,8 +131,9 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
        onPaginationModelChange={onPaginationModelChange}
        onSortModelChange={onSortModelChange}
        paginationModel={pageModel}
-       onRowSelectionModelChange={onSelectionChange}
        loading={isLoading}
+       onRowSelectionModelChange={props.onRowSelectionModelChange}
+       rowSelectionModel={props.selection}
        sortingMode='server'
        autoHeight
        pageSizeOptions={[5, 10, 25, 50]}
@@ -174,18 +154,14 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     </>);
 }
 
-// update filter: clear the paging state to default. Clear the sort state and set to default.
-// update paging: don't change anything else.
-// update sort: clear the paging state and set to default
-
-
 
 export interface DogSearchResultsDataGridProps {
-    onPaginationModelChange?: (model: GridPaginationModel, details: GridCallbackDetails<any>, previousModel: GridPaginationModel, apiRef: MutableRefObject<GridApiCommunity>) => Promise<GridPaginationModel>;
+    onPaginationModelChange?: (model: GridPaginationModel, details: GridCallbackDetails<any>, previousModel: GridPaginationModel, sortModel: GridSortModel) => Promise<GridPaginationModel>;
     onSortModelChange?: (model: GridSortModel, details: GridCallbackDetails<any>, paginationModel: GridPaginationModel) => Promise<void>;
     onFilterModelChange?: (model: DogLookupFilter, pageModel: any, apiRef: React.MutableRefObject<GridApiCommunity>) => Promise<void>;
+    onRowSelectionModelChange?: (rowSelectionModel: GridRowSelectionModel, details: GridCallbackDetails<any>) => void;
     rows: GridRowsProp<Dog>;
     rowCount: number;
     selection?: GridRowSelectionModel;
-    filterModel?: DogLookupFilter;
+    filterModel: DogLookupFilter;
 }
