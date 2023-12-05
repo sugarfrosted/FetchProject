@@ -1,9 +1,8 @@
 import { SelectChangeEvent, Button, Stack } from "@mui/material";
-import { MutableRefObject, useContext, useEffect, useRef, useState } from "react";
-import DogLookup, { DogLookupFilter, DogLookupParams } from "../api/data/DogLookup";
+import { MutableRefObject, useContext, useEffect, useState } from "react";
 import DogSearchResultsDataGrid from "./DogSearchResults/DogSearchResultsDataGrid";
 import { GridPaginationModel, GridCallbackDetails, GridSortModel, GridRowSelectionModel } from "@mui/x-data-grid";
-import { Dog } from "../api/shared/interfaces";
+import { Dog, DogLookupFilter, DogLookupParams } from "../api/shared/DogLookupInterfaces";
 import { GridApiCommunity } from "@mui/x-data-grid/internals";
 import DogBreedDropdown from "./DogSearchResults/DogBreedDropdown";
 import { DogLookupContext } from "../state/DogContext";

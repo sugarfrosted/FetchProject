@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, setRef } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react"
 import { validate as isValidEmail } from "email-validator";
 import { AuthContext } from "../state/DogContext";

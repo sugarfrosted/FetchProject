@@ -1,5 +1,5 @@
 import { AccountCircle, Logout } from "@mui/icons-material";
-import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem, Icon, Tooltip } from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import Authentication from "../api/auth/Authentication";
 import { AuthContext } from "../state/DogContext";
