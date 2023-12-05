@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import logo from './logo.svg';
+import { useMemo, useState } from 'react';
 import './App.css';
-import { Box, AppBar, Toolbar, Typography, Button, IconButton, TextField, Container } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import LoginPane from './components/LoginPane';
 import TopBar from './components/TopBar';
 import DogGreeting from './components/DogGreeting';

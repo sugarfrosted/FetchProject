@@ -1,4 +1,3 @@
-import axios, {AxiosInstance, CreateAxiosDefaults} from 'axios'
 import DogFetchInterviewApi from '../shared/DogFetchInterviewApi';
 
 /**

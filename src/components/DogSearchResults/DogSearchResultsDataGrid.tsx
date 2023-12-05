@@ -1,9 +1,8 @@
 import { Image } from '@mui/icons-material';
 import { IconButton, Popover } from '@mui/material';
 import { DataGrid, GridCallbackDetails, GridColDef, GridPaginationModel, GridRenderCellParams, GridRowSelectionModel, GridRowsProp, GridSortModel, useGridApiRef } from '@mui/x-data-grid';
-import { MutableRefObject, useEffect, useState } from 'react';
-import { Dog } from '../../api/shared/interfaces';
-import { DogLookupFilter } from '../../api/data/DogLookup';
+import { useCallback, useEffect, useState } from 'react';
+import { Dog, DogLookupFilter } from '../../api/shared/DogLookupInterfaces';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
 
 export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps) {
@@ -20,10 +19,8 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     const [isLoading, setIsLoading] = useState(false);
     const apiRef = useGridApiRef();
     const [dogImageUrl, setDogImageUrl] = useState("");
+    const propsOnFilterModelChange = props.onFilterModelChange;
  
-    useEffect(() => {
-        onFilterModelChange(props.filterModel);
-    }, [props.filterModel])
 
 
     function getDogImageAnchor(data: GridRenderCellParams) : any {
@@ -64,7 +61,7 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
         
     }
 
-    async function onFilterModelChange(model: DogLookupFilter)
+    const onFilterModelChange = useCallback(async function onFilterModelChange(model: DogLookupFilter, isLoading: boolean, pageModel: GridPaginationModel)
     {
         if (isLoading) {
             return;
@@ -72,10 +69,10 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
         try {
             setIsLoading(true);
-            await clearSortModel();
-            await setToFirstPage();
-            if (props.onFilterModelChange) {
-                await props.onFilterModelChange(model, pageModel, apiRef)
+            apiRef.current.setSortModel([]);
+            apiRef.current.setPage(0);
+            if (propsOnFilterModelChange) {
+                await propsOnFilterModelChange(model, pageModel, apiRef)
             }
             setPageModel({pageSize: pageModel.pageSize, page: 0})
         } catch (error) {
@@ -84,13 +81,13 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
         finally {
             setIsLoading(false);
         }
-    }
+    },[apiRef, propsOnFilterModelChange])
 
-    async function clearSortModel() {
-        apiRef.current.setSortModel([]);
-    }
+    useEffect(() => {
+        onFilterModelChange(props.filterModel, isLoading, pageModel);
+    }, [props.filterModel])
 
-    async function setToFirstPage() {
+    function setToFirstPage() {
         apiRef.current.setPage(0);
     }
 
@@ -108,7 +105,7 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
         try {
             setIsLoading(true);
             if (props.onSortModelChange) {
-                await setToFirstPage();
+                apiRef.current.setPage(0);
                 await props.onSortModelChange(model, details, pageModel)
             }
         }

@@ -1,5 +1,5 @@
 import DogFetchInterviewApi, { dogParams } from "../shared/DogFetchInterviewApi";
-import { Dog, DogsSearchResult } from "../shared/interfaces";
+import { Dog, DogLookupParams, DogsSearchResult } from "../shared/DogLookupInterfaces";
 import { GridSortModel } from "@mui/x-data-grid";
 
 export default class DogLookup {
@@ -102,31 +102,13 @@ export default class DogLookup {
 
     private static getDogSort(sort: GridSortModel | undefined) : string
     {
-        var activeSort = (sort || []).find(sortItems => ["name", "age", "breed"].findIndex(key => key == sortItems.field) !== -1);
+        var activeSort = (sort || []).find(sortItems => ["name", "age", "breed"].findIndex(key => key === sortItems.field) !== -1);
         var field = activeSort?.field as keyof Dog || "breed";
         var order = activeSort?.sort || 'asc';
 
         return [field, order].join(":");
     }
-
-
 }
-
-export interface DogLookupFilter {
-    zipCodes?: string[] | undefined;
-    breeds?: string[] | undefined;
-    ageMax?: number | undefined;
-    ageMin?: number | undefined;
-}
-
-export interface DogLookupParams
-{
-    filter?: DogLookupFilter;
-    sort?: GridSortModel | undefined;
-    size?: number | undefined,
-    page?: number | undefined
-}
-
 
 type combinedQueryResult = {
     dogs: Dog[];

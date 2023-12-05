@@ -1,5 +1,5 @@
 import axios, {AxiosInstance, AxiosResponse, CreateAxiosDefaults} from 'axios'
-import { Dog, DogsSearchResult, Match } from './interfaces';
+import { Dog, DogsSearchResult, Match } from './DogLookupInterfaces';
 
 
 
