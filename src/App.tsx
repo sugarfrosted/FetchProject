@@ -32,7 +32,11 @@ function App() {
     authLookup.Logout().then(() => {
       setCurrentUserName(null);
       setCurrentUserEmail(null);
-    });
+    },
+    (rejection) => {
+      setCurrentUserName(null);
+      setCurrentUserEmail(null);
+    },);
   };
 
   const loginClickedHandler = () => {

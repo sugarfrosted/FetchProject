@@ -2,6 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react"
 import { validate as isValidEmail } from "email-validator";
 import { AuthContext } from "../state/DogContext";
+import { AxiosError } from "axios";
 
 
 export default function LoginPane(params: loginPaneParams)
@@ -22,33 +23,30 @@ export default function LoginPane(params: loginPaneParams)
     }, [tfNameRef, params.open])
 
     async function handleLoginAttempt() {
+        var loginSuccess: boolean;
         setNameHasError(!name);
         setEmailHasError(!isValidEmail(email));
 
-        if (nameHasError || emailHasError || !loginLookup)
+        if (!name || !isValidEmail(email) || emailHasError || !loginLookup)
         {
             return;
         }
 
-        var loginAttempt = await loginLookup.Login(name, email);
-
-        if(!loginAttempt.isLoggedIn)
-        {
-          return;
-        }
-
+        await loginLookup.Login(name, email).then((result) => {
         if (params.onSuccess)
         {
-          params.onSuccess(name, email);
-        }
-
-        handleClose();
+          params.onSuccess(result.name, result.email);
+        }},
+        error => {if (params.onFailure) params.onFailure(error)}
+        ).finally(() =>
+        handleClose());
      }
 
     async function handleClose() 
     {
       params.onClose();
     }
+
 
     return (
       <Dialog open={params.open}>
@@ -112,6 +110,7 @@ export default function LoginPane(params: loginPaneParams)
 
 export interface loginPaneParams {
     onSuccess?: ((name: string, email: string) => void) | undefined;
+    onFailure?: ((error: any) => void) | undefined;
     onClose: () => void;
     open: boolean;
 }
