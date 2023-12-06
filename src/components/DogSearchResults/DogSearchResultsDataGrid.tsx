@@ -1,7 +1,7 @@
 import { Image } from '@mui/icons-material';
 import { IconButton, Popover } from '@mui/material';
 import { DataGrid, GridCallbackDetails, GridColDef, GridPaginationModel, GridRenderCellParams, GridRowSelectionModel, GridRowsProp, GridSortModel, useGridApiRef } from '@mui/x-data-grid';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Dog, DogLookupFilter } from '../../api/shared/DogLookupInterfaces';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
 
@@ -19,7 +19,8 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     const [isLoading, setIsLoading] = useState(false);
     const apiRef = useGridApiRef();
     const [dogImageUrl, setDogImageUrl] = useState("");
-    const propsOnFilterModelChange = props.onFilterModelChange;
+    const propsOnFilterModelChange = useMemo(() => props.onFilterModelChange, [props.onFilterModelChange]);
+    const propsOnDataLookupError = useMemo(() => props.onDataLookupError, [props.onDataLookupError]);
  
 
 
@@ -52,13 +53,25 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
         }
 
         setIsLoading(true);
-        if (props.onPaginationModelChange)
-        {
-            let updatedPagingModel = await props.onPaginationModelChange(model, details, pageModel, apiRef.current.getSortModel());
-            setPageModel(updatedPagingModel);
+
+        try {
+            if (props.onPaginationModelChange)
+            {
+                let updatedPagingModel = await props.onPaginationModelChange(model, details, pageModel, apiRef.current.getSortModel());
+                setPageModel(updatedPagingModel);
+            }
+        } catch (error) {
+            if (propsOnDataLookupError)
+            {
+                propsOnDataLookupError(error);
+            }
+            else
+            {
+                throw error;
+            }
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
-        
     }
 
     const onFilterModelChange = useCallback(async function onFilterModelChange(model: DogLookupFilter, isLoading: boolean, pageModel: GridPaginationModel)
@@ -76,21 +89,23 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
             }
             setPageModel({pageSize: pageModel.pageSize, page: 0})
         } catch (error) {
-            
-        }
-        finally {
+            if (propsOnDataLookupError)
+            {
+                await propsOnDataLookupError(error);
+            }
+            else
+            {
+                throw error;
+            }
+        } finally {
+
             setIsLoading(false);
         }
-    },[apiRef, propsOnFilterModelChange])
+    },[apiRef, propsOnFilterModelChange, propsOnDataLookupError])
 
     useEffect(() => {
         onFilterModelChange(props.filterModel, isLoading, pageModel);
     }, [props.filterModel])
-
-    function setToFirstPage() {
-        apiRef.current.setPage(0);
-    }
-
 
     /**
      * This should keep selection but invalidate the paging model, i.e., take you to page 1.
@@ -108,10 +123,16 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
                 apiRef.current.setPage(0);
                 await props.onSortModelChange(model, details, pageModel)
             }
-        }
-        catch { }
-        finally
-        {
+        } catch (error) {
+            if (propsOnDataLookupError)
+            {
+                propsOnDataLookupError(error);
+            }
+            else
+            {
+                throw error;
+            }
+        } finally {
             setIsLoading(false);
         }
     }
@@ -157,6 +178,7 @@ export interface DogSearchResultsDataGridProps {
     onSortModelChange?: (model: GridSortModel, details: GridCallbackDetails<any>, paginationModel: GridPaginationModel) => Promise<void>;
     onFilterModelChange?: (model: DogLookupFilter, pageModel: any, apiRef: React.MutableRefObject<GridApiCommunity>) => Promise<void>;
     onRowSelectionModelChange?: (rowSelectionModel: GridRowSelectionModel, details: GridCallbackDetails<any>) => void;
+    onDataLookupError?: (error: any) => Promise<void>;
     rows: GridRowsProp<Dog>;
     rowCount: number;
     selection?: GridRowSelectionModel;

@@ -5,7 +5,7 @@ import { GridPaginationModel, GridCallbackDetails, GridSortModel, GridRowSelecti
 import { Dog, DogLookupFilter, DogLookupParams } from "../api/shared/DogLookupInterfaces";
 import { GridApiCommunity } from "@mui/x-data-grid/internals";
 import DogBreedDropdown from "./DogSearchResults/DogBreedDropdown";
-import { DogLookupContext } from "../state/DogContext";
+import { DogLookupContext, ErrorContext } from "../state/DogContext";
 
 export default function DogSearch(props: dogSearchProps) {
     const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
@@ -17,6 +17,7 @@ export default function DogSearch(props: dogSearchProps) {
     const [prevPagingQuery, setPrevPagingQuery] = useState<string | undefined>();
     const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>();
     const dogLookup = useContext(DogLookupContext);
+    const exceptionHandler = useContext(ErrorContext)
 
 
     const MenuProps = {
@@ -113,6 +114,7 @@ export default function DogSearch(props: dogSearchProps) {
         onSortModelChange={onSortModelChange}
         onFilterModelChange={onFilterModelChanged}
         onRowSelectionModelChange={onRowSelectionModelChange}
+        onDataLookupError={exceptionHandler.HandleError}
         rows={rows}
         rowCount={rowCount}
         filterModel={activeFilter}
@@ -170,13 +172,11 @@ async function onPaginationModelChange(model: GridPaginationModel, details: Grid
 
 
   async function onFilterModelChanged(model: DogLookupFilter, pageModel: GridPaginationModel, gridApiRef: MutableRefObject<GridApiCommunity>): Promise<void> {
-    LoadDogs(gridApiRef.current.getSortModel(), pageModel, model);
+    await LoadDogs(gridApiRef.current.getSortModel(), pageModel, model);
   }
 
   function onRowSelectionModelChange(rowSelectionModel: GridRowSelectionModel, details: GridCallbackDetails<any>): void
   {
-    console.log("cat");
-    console.log(details);
     setRowSelectionModel(rowSelectionModel);
   }
 
