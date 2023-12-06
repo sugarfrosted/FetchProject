@@ -12,9 +12,8 @@ export default class ExceptionHandler {
     public async HandleError(error: any) {
         if (error instanceof AxiosError)
         {
-            console.log("ass2")
-            await this._api.Post_Auth_Logout().catch();
-            console.log("ass")
+            await this.HandleLogout();
+            console.log("SSSSSSSSSSSSSSCREAM")
         }
         else
         {
