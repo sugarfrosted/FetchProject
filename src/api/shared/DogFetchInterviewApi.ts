@@ -68,11 +68,6 @@ export default class DogFetchInverviewApi {
         this.Name = null;
         this.Email = null;
         this.IsLoggedIn = false;
-
-        if (!this.didRequestFail(request))
-        {
-            Promise.reject(request);
-        }
     }
 
     constructor(baseURL: string) {
@@ -92,11 +87,6 @@ export default class DogFetchInverviewApi {
                 url: '/dogs/breeds',
             }) as AxiosResponse<string[]>;
 
-        if (!this.didRequestFail(response))
-        {
-            Promise.reject(response)
-        }
-
         return response.data || [];
     }
 
@@ -108,11 +98,6 @@ export default class DogFetchInverviewApi {
                 url: '/dogs/search',
                 params: params,
             }) as AxiosResponse<DogsSearchResult>;
-
-        if (!this.didRequestFail(response))
-        {
-            return Promise.reject(response);
-        }
 
         return response.data;
     }
@@ -127,11 +112,6 @@ export default class DogFetchInverviewApi {
             }
         ) as AxiosResponse<Dog[]>;
 
-        if (!this.didRequestFail(response))
-        {
-            return Promise.reject(response);
-        }
-
         return response.data || [];
     }
 
@@ -143,11 +123,6 @@ export default class DogFetchInverviewApi {
                 url: '/dogs/match',
                 data: dogsIds,
             }) as AxiosResponse<Match>;
-
-        if (!this.didRequestFail(response))
-        {
-            return Promise.reject(response);
-        }
 
         return response.data;
     }
@@ -161,11 +136,6 @@ export default class DogFetchInverviewApi {
                 data: zipCodes,
             }) as AxiosResponse<Location[]>;
 
-        if (!this.didRequestFail(response))
-        {
-            return Promise.reject(response);
-        }
-
         return response.data || [];
     }
 
@@ -177,11 +147,6 @@ export default class DogFetchInverviewApi {
                 url: '/locations',
                 data: params,
             }) as AxiosResponse<mapSearchResults>;
-
-        if (!this.didRequestFail(response))
-        {
-            return Promise.reject(response);
-        }
 
         return response.data;
     }
@@ -195,23 +160,7 @@ export default class DogFetchInverviewApi {
 
         var response = await this.axiosInstance.get(request);
 
-        if (this.didRequestFail(response))
-        {
-            return Promise.reject(response.status);
-        }
-
         return response.data;
-    }
-
-    private didRequestFail(request: AxiosResponse<any, any>) {
-        if (request.status === 401)
-        {
-            this.Name = null;
-            this.Email = null;
-            this.IsLoggedIn = false;
-        }
-        console.log(request.status)
-        return request.status !== 200 || request.status;
     }
 }
 
