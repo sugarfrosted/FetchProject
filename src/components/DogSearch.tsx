@@ -17,7 +17,6 @@ export default function DogSearch(props: dogSearchProps) {
     const [prevPagingQuery, setPrevPagingQuery] = useState<string | undefined>();
     const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>();
     const dogLookup = useContext(DogLookupContext);
-    const exceptionHandler = useContext(ErrorContext)
 
 
     const MenuProps = {
@@ -114,7 +113,6 @@ export default function DogSearch(props: dogSearchProps) {
         onSortModelChange={onSortModelChange}
         onFilterModelChange={onFilterModelChanged}
         onRowSelectionModelChange={onRowSelectionModelChange}
-        onDataLookupError={exceptionHandler.HandleError}
         rows={rows}
         rowCount={rowCount}
         filterModel={activeFilter}
@@ -128,7 +126,6 @@ async function onSortModelChange(model: GridSortModel, _details: GridCallbackDet
 }
 
 async function onPaginationModelChange(model: GridPaginationModel, details: GridCallbackDetails<any>, previousModel: GridPaginationModel, sortModel: GridSortModel): Promise<GridPaginationModel> {
-  console.log("external handler")
   var updatedModel: GridPaginationModel = model;
   var pageSizeChanged = false;
 

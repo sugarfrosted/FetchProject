@@ -1,9 +1,11 @@
 import { Image } from '@mui/icons-material';
 import { IconButton, Popover } from '@mui/material';
 import { DataGrid, GridCallbackDetails, GridColDef, GridPaginationModel, GridRenderCellParams, GridRowSelectionModel, GridRowsProp, GridSortModel, useGridApiRef } from '@mui/x-data-grid';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Dog, DogLookupFilter } from '../../api/shared/DogLookupInterfaces';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
+import ExceptionHandler from '../../api/shared/ExceptionHandler';
+import { ErrorContext } from '../../state/DogContext';
 
 export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps) {
     const columns: GridColDef[] = [
@@ -20,7 +22,7 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     const apiRef = useGridApiRef();
     const [dogImageUrl, setDogImageUrl] = useState("");
     const propsOnFilterModelChange = useMemo(() => props.onFilterModelChange, [props.onFilterModelChange]);
-    const propsOnDataLookupError = useMemo(() => props.onDataLookupError, [props.onDataLookupError]);
+    const errorContext = useContext(ErrorContext);
  
 
 
@@ -61,9 +63,9 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
                 setPageModel(updatedPagingModel);
             }
         } catch (error) {
-            if (propsOnDataLookupError)
+            if (errorContext)
             {
-                propsOnDataLookupError(error);
+                errorContext.HandleError(error);
             }
             else
             {
@@ -89,9 +91,9 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
             }
             setPageModel({pageSize: pageModel.pageSize, page: 0})
         } catch (error) {
-            if (propsOnDataLookupError)
+            if (errorContext)
             {
-                await propsOnDataLookupError(error);
+                await errorContext.HandleError(error);
             }
             else
             {
@@ -101,10 +103,13 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
             setIsLoading(false);
         }
-    },[apiRef, propsOnFilterModelChange, propsOnDataLookupError])
+    },[apiRef, propsOnFilterModelChange, errorContext])
 
     useEffect(() => {
-        onFilterModelChange(props.filterModel, isLoading, pageModel);
+        const fetchData = async (filterModel: DogLookupFilter, isLoading: boolean, pageModel: GridPaginationModel) => {
+            await onFilterModelChange(filterModel, isLoading, pageModel);
+        }
+        fetchData(props.filterModel, isLoading, pageModel).catch(() => {console.log("I'm crying")})
     }, [props.filterModel])
 
     /**
@@ -124,9 +129,9 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
                 await props.onSortModelChange(model, details, pageModel)
             }
         } catch (error) {
-            if (propsOnDataLookupError)
+            if (errorContext)
             {
-                propsOnDataLookupError(error);
+                errorContext.HandleError(error);
             }
             else
             {
@@ -178,7 +183,6 @@ export interface DogSearchResultsDataGridProps {
     onSortModelChange?: (model: GridSortModel, details: GridCallbackDetails<any>, paginationModel: GridPaginationModel) => Promise<void>;
     onFilterModelChange?: (model: DogLookupFilter, pageModel: any, apiRef: React.MutableRefObject<GridApiCommunity>) => Promise<void>;
     onRowSelectionModelChange?: (rowSelectionModel: GridRowSelectionModel, details: GridCallbackDetails<any>) => void;
-    onDataLookupError?: (error: any) => Promise<void>;
     rows: GridRowsProp<Dog>;
     rowCount: number;
     selection?: GridRowSelectionModel;
