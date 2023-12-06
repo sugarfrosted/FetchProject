@@ -2,7 +2,6 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react"
 import { validate as isValidEmail } from "email-validator";
 import { AuthContext } from "../state/DogContext";
-import { AxiosError } from "axios";
 
 
 export default function LoginPane(params: loginPaneParams)
@@ -23,11 +22,10 @@ export default function LoginPane(params: loginPaneParams)
     }, [tfNameRef, params.open])
 
     async function handleLoginAttempt() {
-        var loginSuccess: boolean;
         setNameHasError(!name);
         setEmailHasError(!isValidEmail(email));
 
-        if (!name || !isValidEmail(email) || emailHasError || !loginLookup)
+        if (!name || !isValidEmail(email) || !loginLookup)
         {
             return;
         }
