@@ -58,16 +58,16 @@ export default class DogFetchInverviewApi {
      * Revoke cookie
      */
     public async Post_Auth_Logout(): Promise<void> {
-        const request = await this.axiosInstance.request(
+        await this.axiosInstance.request(
             {
                 method: 'post',
                 url: '/auth/logout',
             }
-        );
-
-        this.Name = null;
-        this.Email = null;
-        this.IsLoggedIn = false;
+        ).finally(() => {
+                this.Name = null;
+                this.Email = null;
+                this.IsLoggedIn = false;}
+            );
     }
 
     constructor(baseURL: string) {
