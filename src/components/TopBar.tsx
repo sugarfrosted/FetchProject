@@ -3,14 +3,17 @@ import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Toolti
 import { useContext, useEffect, useState } from "react";
 import Authentication from "../api/auth/Authentication";
 import { AuthContext } from "../state/DogContext";
+import { useRecoilValue } from "recoil";
+import { userLoginState } from "../state/atoms";
 
-export default function TopBar(props : topBarProps)
+export default function TopBar(props: TopBarProps)
 {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const authLookup = useContext(AuthContext);
+  const loginState = useRecoilValue(userLoginState);
 
-  useEffect(() => { setIsLoggedIn(!!props?.name && !!props?.email) }, [props?.email, props.name]);
+  useEffect(() => { setIsLoggedIn(loginState.loginStatus) }, [loginState]);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -43,7 +46,7 @@ export default function TopBar(props : topBarProps)
       {
         isLoggedIn ?
         (<div>
-          <Tooltip title={`Current User: ${props.name}`} >
+          <Tooltip title={`Current User: ${loginState.userName}`} >
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -82,8 +85,8 @@ export default function TopBar(props : topBarProps)
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem>Name: {props.name}</MenuItem>
-            <MenuItem>Email: {props.email}</MenuItem>
+            <MenuItem>Name: {loginState.userName}</MenuItem>
+            <MenuItem>Email: {loginState.email}</MenuItem>
           </Menu>
         </div>) :
         (<Button onClick={handleLogin} color="inherit">Login</Button>)
@@ -93,9 +96,7 @@ export default function TopBar(props : topBarProps)
   );
 }
 
-interface topBarProps {
-  name: string | null;
-  email: string | null;
+interface TopBarProps {
   loginClickedHandler?: (() => void) | undefined;
   logoutClickedHandler?: ((auth: Authentication) => void) | undefined;
 }

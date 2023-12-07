@@ -4,8 +4,9 @@ import { DataGrid, GridCallbackDetails, GridColDef, GridPaginationModel, GridRen
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Dog, DogLookupFilter } from '../../api/shared/DogLookupInterfaces';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
-import ExceptionHandler from '../../api/shared/ExceptionHandler';
 import { ErrorContext } from '../../state/DogContext';
+import { useSetRecoilState } from 'recoil';
+import { userLoginState } from '../../state/atoms';
 
 export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps) {
     const columns: GridColDef[] = [
@@ -23,6 +24,8 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     const [dogImageUrl, setDogImageUrl] = useState("");
     const propsOnFilterModelChange = useMemo(() => props.onFilterModelChange, [props.onFilterModelChange]);
     const errorContext = useContext(ErrorContext);
+    const setLoginState = useSetRecoilState(userLoginState);
+    const errorCallback = useCallback(() => { setLoginState( {userName: null, email: null, loginStatus: false} ) }, [setLoginState])
  
 
 
@@ -42,6 +45,16 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
       const handlePopoverClose = () => {
         //setAnchorEl(null);
       };
+
+    const handleError = useCallback(async function handleError(error: unknown) {
+        if (errorContext) {
+            errorContext.HandleError(error, errorCallback);
+        }
+        else {
+            throw error;
+        }
+    }, [errorContext, errorCallback])
+
 
     /**
      * Get the next or previous. Might need to see if this is a new load.
@@ -63,14 +76,7 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
                 setPageModel(updatedPagingModel);
             }
         } catch (error) {
-            if (errorContext)
-            {
-                errorContext.HandleError(error);
-            }
-            else
-            {
-                throw error;
-            }
+            handleError(error);
         } finally {
             setIsLoading(false);
         }
@@ -91,26 +97,16 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
             }
             setPageModel({pageSize: pageModel.pageSize, page: 0})
         } catch (error) {
-            if (errorContext)
-            {
-                await errorContext.HandleError(error);
-            }
-            else
-            {
-                throw error;
-            }
+            handleError(error);
         } finally {
 
             setIsLoading(false);
         }
-    },[apiRef, propsOnFilterModelChange, errorContext])
+    },[apiRef, propsOnFilterModelChange, handleError])
 
     useEffect(() => {
-        const fetchData = async (filterModel: DogLookupFilter, isLoading: boolean, pageModel: GridPaginationModel) => {
-            await onFilterModelChange(filterModel, isLoading, pageModel);
-        }
-        fetchData(props.filterModel, isLoading, pageModel).catch(() => {console.log("I'm crying")})
-    }, [props.filterModel])
+        onFilterModelChange(props.filterModel, isLoading, pageModel);
+    }, [props.filterModel, onFilterModelChange, isLoading, pageModel])
 
     /**
      * This should keep selection but invalidate the paging model, i.e., take you to page 1.
@@ -129,14 +125,7 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
                 await props.onSortModelChange(model, details, pageModel)
             }
         } catch (error) {
-            if (errorContext)
-            {
-                errorContext.HandleError(error);
-            }
-            else
-            {
-                throw error;
-            }
+            handleError(error);
         } finally {
             setIsLoading(false);
         }
