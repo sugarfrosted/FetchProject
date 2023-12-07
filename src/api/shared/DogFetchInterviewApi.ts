@@ -66,8 +66,9 @@ export default class DogFetchInverviewApi {
         ).finally(() => {
                 this.Name = null;
                 this.Email = null;
-                this.IsLoggedIn = false;}
-            );
+                this.IsLoggedIn = false;
+            }
+        );
     }
 
     constructor(baseURL: string) {
