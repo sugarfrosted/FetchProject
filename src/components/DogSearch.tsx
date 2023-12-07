@@ -1,11 +1,13 @@
 import { SelectChangeEvent, Button, Stack } from "@mui/material";
-import { MutableRefObject, useContext, useEffect, useState } from "react";
+import { MutableRefObject, useContext, useEffect, useMemo, useState } from "react";
 import DogSearchResultsDataGrid from "./DogSearchResults/DogSearchResultsDataGrid";
 import { GridPaginationModel, GridCallbackDetails, GridSortModel, GridRowSelectionModel } from "@mui/x-data-grid";
 import { Dog, DogLookupFilter, DogLookupParams } from "../api/shared/DogLookupInterfaces";
 import { GridApiCommunity } from "@mui/x-data-grid/internals";
 import DogBreedDropdown from "./DogSearchResults/DogBreedDropdown";
 import { DogLookupContext, ErrorContext } from "../state/DogContext";
+import _ from 'lodash';
+
 
 export default function DogSearch(props: dogSearchProps) {
     const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
@@ -17,6 +19,14 @@ export default function DogSearch(props: dogSearchProps) {
     const [prevPagingQuery, setPrevPagingQuery] = useState<string | undefined>();
     const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>();
     const dogLookup = useContext(DogLookupContext);
+    const filterHasChanges = useMemo( () => { 
+      console.log("aaaa");
+      const breedsHaveChanges = _.difference(
+        _.union(selectedBreeds, activeFilter.breeds || []),
+        _.intersection(selectedBreeds, activeFilter.breeds || [])
+        ).length !== 0;
+      return breedsHaveChanges;
+    } ,[selectedBreeds, activeFilter])
 
 
     const MenuProps = {
@@ -35,8 +45,6 @@ export default function DogSearch(props: dogSearchProps) {
             setDogBreeds(breeds);
           })}
     }, [dogLookup, dogLookup?.IsLoggedin])
-
-    useEffect(() => {}, [activeFilter])
 
   async function LoadDogs(sortModel: GridSortModel, pageModel: GridPaginationModel, filter?: DogLookupFilter | undefined | null) {
     var queryParams: DogLookupParams = {};
@@ -104,8 +112,8 @@ export default function DogSearch(props: dogSearchProps) {
         handleChange={handleDogBreedDropdownChange}
         menuProps={MenuProps}/>
       <Stack direction={"column"}>
-        <Button onClick={() => {updateFilter()}}>Update Filter</Button>
-        <Button onClick={() => {setSelectedBreeds([])}}>Clear Search</Button>
+        <Button onClick={() => {updateFilter()}}>{filterHasChanges ? "Update Filter" : "Rerun Search"}</Button>
+        <Button onClick={() => {setSelectedBreeds([]); updateFilter();}}>Clear Search</Button>
   
       </Stack>
       <DogSearchResultsDataGrid 

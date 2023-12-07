@@ -82,7 +82,7 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
         }
     }
 
-    const onFilterModelChange = useCallback(async function onFilterModelChange(model: DogLookupFilter, isLoading: boolean, pageModel: GridPaginationModel)
+    const onFilterModelChange = useCallback(async function onFilterModelChange(model: DogLookupFilter)
     {
         if (isLoading) {
             return;
@@ -90,7 +90,6 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
         try {
             setIsLoading(true);
-            apiRef.current.setSortModel([]);
             apiRef.current.setPage(0);
             if (propsOnFilterModelChange) {
                 await propsOnFilterModelChange(model, pageModel, apiRef)
@@ -105,8 +104,8 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     },[apiRef, propsOnFilterModelChange, handleError])
 
     useEffect(() => {
-        onFilterModelChange(props.filterModel, isLoading, pageModel);
-    }, [props.filterModel, onFilterModelChange, isLoading, pageModel])
+        onFilterModelChange(props.filterModel);
+    }, [props.filterModel])
 
     /**
      * This should keep selection but invalidate the paging model, i.e., take you to page 1.
