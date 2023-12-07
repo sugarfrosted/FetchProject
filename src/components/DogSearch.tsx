@@ -18,15 +18,16 @@ export default function DogSearch(props: dogSearchProps) {
     const [nextPagingQuery, setNextPagingQuery] = useState<string | undefined>();
     const [prevPagingQuery, setPrevPagingQuery] = useState<string | undefined>();
     const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>();
+    const [isCleared, setIsCleared] = useState<boolean>(false);
+
     const dogLookup = useContext(DogLookupContext);
     const filterHasChanges = useMemo( () => { 
-      console.log("aaaa");
       const breedsHaveChanges = _.difference(
         _.union(selectedBreeds, activeFilter.breeds || []),
         _.intersection(selectedBreeds, activeFilter.breeds || [])
         ).length !== 0;
       return breedsHaveChanges;
-    } ,[selectedBreeds, activeFilter])
+    } ,[selectedBreeds, activeFilter]);
 
 
     const MenuProps = {
@@ -88,14 +89,22 @@ export default function DogSearch(props: dogSearchProps) {
       });
   }
 
-  function updateFilter() {
-    var filter: DogLookupFilter = {}
-    if (selectedBreeds && selectedBreeds.length > 0)
-    {
-      filter.breeds = selectedBreeds;
-    }
+  function updateFilterOnClick()
+  {
+    updateFilter(selectedBreeds);
+  }
+
+  function updateFilter(selectedBreeds: string[], isClearing: boolean = false) {
+    var filter: DogLookupFilter = {};
+    filter.breeds = selectedBreeds;
 
     setActiveFilter(filter);
+    setIsCleared(isClearing);
+  }
+
+  function clearFilter() {
+    setSelectedBreeds([]);
+    updateFilter([]);
   }
 
   const handleDogBreedDropdownChange = (event: SelectChangeEvent<typeof selectedBreeds>) => {
@@ -112,8 +121,8 @@ export default function DogSearch(props: dogSearchProps) {
         handleChange={handleDogBreedDropdownChange}
         menuProps={MenuProps}/>
       <Stack direction={"column"}>
-        <Button onClick={() => {updateFilter()}}>{filterHasChanges ? "Update Filter" : "Rerun Search"}</Button>
-        <Button onClick={() => {setSelectedBreeds([]); updateFilter();}}>Clear Search</Button>
+        <Button onClick={updateFilterOnClick}>{!isCleared && filterHasChanges ? "Update Filter" : "Rerun Search"}</Button>
+        <Button onClick={clearFilter}>Clear Search</Button>
   
       </Stack>
       <DogSearchResultsDataGrid 
@@ -130,7 +139,7 @@ export default function DogSearch(props: dogSearchProps) {
 
 async function onSortModelChange(model: GridSortModel, _details: GridCallbackDetails<any>, paginationModel: GridPaginationModel): Promise<void> {
 
-  await LoadDogs(model, paginationModel ,activeFilter);
+  await LoadDogs(model, paginationModel, activeFilter);
 }
 
 async function onPaginationModelChange(model: GridPaginationModel, details: GridCallbackDetails<any>, previousModel: GridPaginationModel, sortModel: GridSortModel): Promise<GridPaginationModel> {
