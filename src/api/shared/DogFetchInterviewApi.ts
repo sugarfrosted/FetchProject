@@ -103,13 +103,14 @@ export default class DogFetchInverviewApi {
         return response.data;
     }
     
-    public async Post_Dogs(dogsIds: string[]) : Promise<Dog[]> {
+    public async Post_Dogs(dogsIds: string[] | string) : Promise<Dog[]> {
+        const dogsIdArray: string[] = typeof dogsIds === 'string' ? [dogsIds] : dogsIds;
 
         const response = await this.axiosInstance.request(
             {
                 method: 'post',
                 url: '/dogs',
-                data: dogsIds,
+                data: dogsIdArray,
             }
         ) as AxiosResponse<Dog[]>;
 

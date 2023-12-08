@@ -1,18 +1,20 @@
 import { Image } from '@mui/icons-material';
 import { IconButton, Popover } from '@mui/material';
-import { DataGrid, GridCallbackDetails, GridColDef, GridPaginationModel, GridRenderCellParams, GridRowSelectionModel, GridRowsProp, GridSortModel, useGridApiRef } from '@mui/x-data-grid';
+import { DataGrid, GridCallbackDetails, GridColDef, GridPaginationModel, GridRenderCellParams, GridRowSelectionModel, GridRowsProp, GridSortModel, GridValueFormatterParams, useGridApiRef } from '@mui/x-data-grid';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Dog, DogLookupFilter } from '../../api/shared/DogLookupInterfaces';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
 import { ErrorContext } from '../../state/DogContext';
 import { useSetRecoilState } from 'recoil';
 import { userLoginState } from '../../state/atoms';
+import { PrettifyAge } from '../../utils/TextFormattingUtitilies';
 
 export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps) {
     const columns: GridColDef[] = [
         { field: 'name', headerName: 'Name', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, flex: 1 },
         { field: 'img', headerName: 'Image', sortable: false, hideable: false ,filterable: false, disableColumnMenu: true, renderCell: (data) => getDogImageAnchor(data) },
-        { field: 'age', headerName: 'Age', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, },
+        { field: 'age', headerName: 'Age', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true,
+            valueFormatter: (params: GridValueFormatterParams<number>) => PrettifyAge(params.value)},
         { field: 'zip_code', headerName: 'ZIP Code', sortable: false, hideable: false ,filterable: false, disableColumnMenu: true, },
         { field: 'breed', headerName: 'Breed', sortable: true, hideable: false ,filterable: false, disableColumnMenu: true, flex: 1},
     ];
@@ -27,7 +29,6 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     const setLoginState = useSetRecoilState(userLoginState);
     const errorCallback = useCallback(() => { setLoginState( {userName: null, email: null, loginStatus: false} ) }, [setLoginState])
  
-
 
     function getDogImageAnchor(data: GridRenderCellParams) : any {
         // var handlePopoverOpen = getHandlePopoverOpen(data.value)
@@ -84,6 +85,7 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
     const onFilterModelChange = useCallback(async function onFilterModelChange(model: DogLookupFilter)
     {
+        console.log(model)
         if (isLoading) {
             return;
         }

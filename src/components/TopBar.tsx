@@ -38,7 +38,7 @@ export default function TopBar(props: TopBarProps)
   };
 
   return (
-  <AppBar position="static" sx={{marginBottom: "2em"}}>
+  <AppBar position="sticky" sx={{marginBottom: "2em"}}>
     <Toolbar>
       <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>
         Dog Searcher!

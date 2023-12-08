@@ -7,9 +7,11 @@ import { GridApiCommunity } from "@mui/x-data-grid/internals";
 import DogBreedDropdown from "./DogSearchResults/DogBreedDropdown";
 import { DogLookupContext, ErrorContext } from "../state/DogContext";
 import _ from 'lodash';
+import DogMatchDisplay, { NoMatchFound } from "./DogSearchResults/DogMatchDisplay";
+import DogAgeRangeSelector from "./DogSearchResults/DogAgeRangeSelector";
 
 
-export default function DogSearch(props: dogSearchProps) {
+export default function DogSearch(_props: dogSearchProps) {
     const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
     const [dogBreeds, setDogBreeds] = useState<string[]>([]);
     const [activeFilter, setActiveFilter] = useState<DogLookupFilter>({})
@@ -18,16 +20,22 @@ export default function DogSearch(props: dogSearchProps) {
     const [nextPagingQuery, setNextPagingQuery] = useState<string | undefined>();
     const [prevPagingQuery, setPrevPagingQuery] = useState<string | undefined>();
     const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>();
-    const [isCleared, setIsCleared] = useState<boolean>(false);
+    const [isCleared, setIsCleared] = useState(false);
+    const [selectedAgeRange, setSelectedAgeRange] = useState<number[]>([0, 32])
+    const [showNoMatch, setShowNoMatch] = useState(false)
+    const [dogMatch, setDogMatch] = useState<Dog>();
 
     const dogLookup = useContext(DogLookupContext);
+    const errorContext = useContext(ErrorContext);
     const filterHasChanges = useMemo( () => { 
       const breedsHaveChanges = _.difference(
         _.union(selectedBreeds, activeFilter.breeds || []),
         _.intersection(selectedBreeds, activeFilter.breeds || [])
         ).length !== 0;
-      return breedsHaveChanges;
-    } ,[selectedBreeds, activeFilter]);
+      const ageRangeHasChanges = (activeFilter.ageMin ?? 0) !== Math.min(selectedAgeRange[0], selectedAgeRange[1]) ||
+              (activeFilter.ageMax ?? 32) !== Math.max(selectedAgeRange[0], selectedAgeRange[1])
+      return breedsHaveChanges || ageRangeHasChanges;
+    } ,[selectedBreeds, selectedAgeRange, activeFilter]);
 
 
     const MenuProps = {
@@ -91,12 +99,20 @@ export default function DogSearch(props: dogSearchProps) {
 
   function updateFilterOnClick()
   {
-    updateFilter(selectedBreeds);
+    updateFilter(selectedBreeds, selectedAgeRange);
   }
 
-  function updateFilter(selectedBreeds: string[], isClearing: boolean = false) {
+  function updateFilter(selectedBreeds: string[], selectedAgeRange: number[], isClearing: boolean = false) {
     var filter: DogLookupFilter = {};
     filter.breeds = selectedBreeds;
+    {
+      let ageMin = Math.min(selectedAgeRange[0], selectedAgeRange[1]);
+      if (ageMin >= 0) filter.ageMin = ageMin;
+    }
+    {
+      let ageMax = Math.max(selectedAgeRange[0], selectedAgeRange[1]);
+      if (ageMax <= 32) filter.ageMax = ageMax;
+    }
 
     setActiveFilter(filter);
     setIsCleared(isClearing);
@@ -104,7 +120,8 @@ export default function DogSearch(props: dogSearchProps) {
 
   function clearFilter() {
     setSelectedBreeds([]);
-    updateFilter([]);
+    setSelectedAgeRange([0, 32]);
+    updateFilter([], [0, 32], true);
   }
 
   const handleDogBreedDropdownChange = (event: SelectChangeEvent<typeof selectedBreeds>) => {
@@ -113,6 +130,29 @@ export default function DogSearch(props: dogSearchProps) {
   };
 
 
+  async function findMatch(_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    var dogIds = (rowSelectionModel || []).map(gridRowId => gridRowId as string);
+    if (!dogIds) {
+      return;
+    }
+
+    try {
+      var dog = await dogLookup.GetMatch(dogIds);
+
+      if(dog)
+      {
+        setDogMatch(dog);
+      }
+      else{
+        setShowNoMatch(true);
+      }
+    }
+    catch (error)
+    {
+      errorContext.HandleError(error)
+    }
+  }
+
   return (
     <div>
       <DogBreedDropdown sx={{ m: 1, width: "100%", mt: 3 }}
@@ -120,10 +160,11 @@ export default function DogSearch(props: dogSearchProps) {
         selectedBreeds={selectedBreeds}
         handleChange={handleDogBreedDropdownChange}
         menuProps={MenuProps}/>
+        <DogAgeRangeSelector handleChange={handleDogAgeChange} value={selectedAgeRange} />
       <Stack direction={"column"}>
         <Button onClick={updateFilterOnClick}>{!isCleared && filterHasChanges ? "Update Filter" : "Rerun Search"}</Button>
         <Button onClick={clearFilter}>Clear Search</Button>
-  
+        <Button onClick={findMatch} disabled={!rowSelectionModel || rowSelectionModel.length === 0}>Find Match</Button>
       </Stack>
       <DogSearchResultsDataGrid 
         onPaginationModelChange={onPaginationModelChange}
@@ -134,11 +175,20 @@ export default function DogSearch(props: dogSearchProps) {
         rowCount={rowCount}
         filterModel={activeFilter}
         selection={rowSelectionModel} />
-      </div>
+      <DogMatchDisplay
+        match={dogMatch}
+        open={!!dogMatch}
+        onClose={() => setDogMatch(undefined!)}/>
+      <NoMatchFound open={showNoMatch} handleClose={() => { setShowNoMatch(false); }} />
+    </div>
 );
 
-async function onSortModelChange(model: GridSortModel, _details: GridCallbackDetails<any>, paginationModel: GridPaginationModel): Promise<void> {
+function handleDogAgeChange(_event: Event, value: number[] | number, _activeThumb: number): void {
+      var selection: number[] = typeof value === 'number' ? value = [value, value] : value;
+      setSelectedAgeRange(selection);
+    };
 
+async function onSortModelChange(model: GridSortModel, _details: GridCallbackDetails<any>, paginationModel: GridPaginationModel): Promise<void> {
   await LoadDogs(model, paginationModel, activeFilter);
 }
 
