@@ -49,6 +49,16 @@ export default class DogLookup {
         return lookupResult;
     }
 
+    public async GetMatch(dogIds: string[]): Promise<Dog | undefined> {
+        var matchResult = await this._api.Post_Dogs_Match(dogIds);
+        if (!matchResult.match)
+        {
+            return;
+        }
+        var matchDog = await this._api.Post_Dogs(matchResult.match).then(result => result[0]);
+        return matchDog;
+    }
+
 
     private static unPackResult(dogs: Dog[], searchResult: DogsSearchResult) {
 
