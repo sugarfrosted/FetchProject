@@ -1,4 +1,6 @@
-import { GridSortModel } from "@mui/x-data-grid"
+import {
+    GridSortModel,
+} from "@mui/x-data-grid";
 
 export interface Location {
     zip_code: string
@@ -31,7 +33,7 @@ export interface DogsSearchResult {
 }
 
 export interface Match {
-    match: string
+    match: string;
 }
 
 
@@ -42,8 +44,7 @@ export interface DogLookupFilter {
     ageMin?: number | undefined;
 }
 
-export interface DogLookupParams
-{
+export interface DogLookupParams {
     filter?: DogLookupFilter;
     sort?: GridSortModel | undefined;
     size?: number | undefined,

@@ -1,14 +1,21 @@
-import axios, {AxiosInstance, AxiosResponse, CreateAxiosDefaults} from 'axios'
-import { Dog, DogsSearchResult, Match } from './DogLookupInterfaces';
+import axios, {
+    AxiosInstance,
+    AxiosResponse,
+    CreateAxiosDefaults,
+} from 'axios';
+import {
+    Dog,
+    DogsSearchResult,
+    Match,
+} from './DogLookupInterfaces';
 
 
 
 export default class DogFetchInverviewApi {
 
-    private _name: string | null = null;
-
     IsLoggedIn: boolean = false;
 
+    private _name: string | null = null;
     public get Name(): string | null {
         return this._name;
     }
@@ -41,8 +48,7 @@ export default class DogFetchInverviewApi {
             }
         );
 
-        if (request.status !== 200 && request.status !== 401)
-        {
+        if (request.status !== 200 && request.status !== 401) {
             Promise.reject(request.status);
         }
 
@@ -50,7 +56,7 @@ export default class DogFetchInverviewApi {
         this.Email = email;
         this.IsLoggedIn = true;
 
-        return {name: this.Name, email: this.Email, isLoggedIn: this.IsLoggedIn }
+        return { name: this.Name, email: this.Email, isLoggedIn: this.IsLoggedIn };
 
     }
 
@@ -64,11 +70,10 @@ export default class DogFetchInverviewApi {
                 url: '/auth/logout',
             }
         ).finally(() => {
-                this.Name = null;
-                this.Email = null;
-                this.IsLoggedIn = false;
-            }
-        );
+            this.Name = null;
+            this.Email = null;
+            this.IsLoggedIn = false;
+        });
     }
 
     constructor(baseURL: string) {
@@ -80,8 +85,7 @@ export default class DogFetchInverviewApi {
     }
 
 
-    public async Get_Dogs_Breeds(): Promise<string[]>
-    {
+    public async Get_Dogs_Breeds(): Promise<string[]> {
         const response = await this.axiosInstance.request(
             {
                 method: 'get',
@@ -91,8 +95,7 @@ export default class DogFetchInverviewApi {
         return response.data || [];
     }
 
-    public async Get_Dogs_Search(params: dogParams): Promise<DogsSearchResult>
-    {
+    public async Get_Dogs_Search(params: dogParams): Promise<DogsSearchResult> {
         const response = await this.axiosInstance.request(
             {
                 method: 'get',
@@ -102,7 +105,7 @@ export default class DogFetchInverviewApi {
 
         return response.data;
     }
-    
+
     public async Post_Dogs(dogsIds: string[] | string) : Promise<Dog[]> {
         const dogsIdArray: string[] = typeof dogsIds === 'string' ? [dogsIds] : dogsIds;
 
@@ -129,8 +132,7 @@ export default class DogFetchInverviewApi {
         return response.data;
     }
 
-    public async Post_Locations(zipCodes: string[]) : Promise<Location[]>
-    {
+    public async Post_Locations(zipCodes: string[]) : Promise<Location[]> {
         const response = await this.axiosInstance.request(
             {
                 method: 'post',
@@ -141,8 +143,7 @@ export default class DogFetchInverviewApi {
         return response.data || [];
     }
 
-    public async Locations_Search(params: locationsParams) : Promise<mapSearchResults>
-    {
+    public async Locations_Search(params: locationsParams) : Promise<mapSearchResults> {
         const response = await this.axiosInstance.request(
             {
                 method: 'post',
@@ -153,11 +154,9 @@ export default class DogFetchInverviewApi {
         return response.data;
     }
 
-    public async Run_Get_Query(request: string)
-    {
-        if (!request.match(/^\/dogs\/search\?/i))
-        {
-            return Promise.reject("Unsupported call.")
+    public async Run_Get_Query(request: string) {
+        if (!request.match(/^\/dogs\/search\?/i)) {
+            return Promise.reject("Unsupported call.");
         }
 
         var response = await this.axiosInstance.get(request);
@@ -172,8 +171,7 @@ export interface mapSearchResults {
 }
 
 
-export interface dogParams
-{
+export interface dogParams {
     breeds?: string[];
     zipCodes?: string[];
     ageMin?: number | undefined;
@@ -183,8 +181,7 @@ export interface dogParams
     sort?: string;
 }
 
-export interface locationsParams
-{
+export interface locationsParams {
     city?: string;
     state?: string;
     geoBoundingBox?: boundingBox;
@@ -192,22 +189,19 @@ export interface locationsParams
     from?: any;
 }
 
-interface AllCorners
-{
+interface AllCorners {
     top: Location,
     bottom: Location,
     left: Location,
     right: Location,
 }
 
-interface BottomLeftToTopRight
-{
+interface BottomLeftToTopRight {
     bottom_left: Location,
     top_right: Location,
 }
 
-interface BottomRightToTopLeft
-{
+interface BottomRightToTopLeft {
     bottom_right: Location,
     top_left: Location,
 }
