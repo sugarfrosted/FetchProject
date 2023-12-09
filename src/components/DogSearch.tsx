@@ -179,7 +179,7 @@ export default function DogSearch(_props: dogSearchProps) {
           handleChange={handleDogBreedDropdownChange}
           menuProps={MenuProps}
         />
-        <DogAgeRangeSelector handleChange={handleDogAgeChange} value={selectedAgeRange} />
+        <DogAgeRangeSelector sx={{ m: 1, width: "100%", mt: 3 }} handleChange={handleDogAgeChange} value={selectedAgeRange} />
         <Stack direction={"column"}>
           <Button onClick={updateFilterOnClick}>{!isCleared && filterHasChanges ? "Update Filter" : "Rerun Search"}</Button>
           <Button onClick={clearFilter}>Clear Search</Button>

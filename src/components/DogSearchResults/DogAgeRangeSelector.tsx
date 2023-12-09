@@ -1,6 +1,11 @@
 import {
+    Theme,
+} from "@emotion/react";
+import {
     Box,
+    InputLabel,
     Slider,
+    SxProps,
 } from '@mui/material';
 
 export default function DogAgeSlider(props: DogAgeRangeSelectorProps) {
@@ -16,9 +21,10 @@ export default function DogAgeSlider(props: DogAgeRangeSelectorProps) {
 
     return (
     /* eslint-disable indent */
-      <Box sx={{ width: 300 }}>
+      <Box sx={props.sx}>
+        <InputLabel id="lblSelectAge"
         <Slider
-          getAriaLabel={() => 'Temperature range'}
+          aria-labelledby=""
           value={props.value}
           marks={marks}
           min={0}
@@ -34,4 +40,5 @@ export default function DogAgeSlider(props: DogAgeRangeSelectorProps) {
 interface DogAgeRangeSelectorProps {
     handleChange: (event: Event, value: number[] | number, activeThumb: number) => void;
     value: number[];
+    sx?: SxProps<Theme> | undefined;
 }

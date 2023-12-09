@@ -44,7 +44,7 @@ export default class DogFetchInverviewApi {
                 data: {
                     name: name,
                     email: email,
-                }
+                },
             }
         );
 
