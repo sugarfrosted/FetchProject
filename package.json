@@ -34,10 +34,87 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
+    "plugins": [
+      "@stylistic",
+      "@stylistic/ts",
+      "@stylistic/jsx"
+    ],
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "@stylistic/ts/semi": "error",
+      "semi-spacing": [
+        "error",
+        {
+          "before": false,
+          "after": true
+        }
+      ],
+      "curly": "error",
+      "indent": [
+        "warn"
+      ],
+      "@stylistic/ts/comma-spacing": [
+        "error",
+        {
+          "before": false,
+          "after": true
+        }
+      ],
+      "@stylistic/ts/space-infix-ops": [
+        "error",
+        {
+          "int32Hint": false
+        }
+      ],
+      "@stylistic/ts/brace-style": [
+        "error",
+        "1tbs",
+        {
+          "allowSingleLine": true
+        }
+      ],
+      "@stylistic/jsx/jsx-indent": [
+        "warn",
+        2,
+        {
+          "checkAttributes": true,
+          "indentLogicalExpressions": true
+        }
+      ],
+      "@stylistic/no-trailing-spaces": "warn",
+      "switch-colon-spacing": [
+        "warn",
+        {
+          "after": true,
+          "before": false
+        }
+      ],
+      "@stylistic/no-tabs":
+      [
+        "warn"
+      ],
+      "@stylistic/linebreak-style": [
+        "warn",
+        "unix"
+      ],
+      "@stylistic/arrow-parens": [
+        "warn",
+        "as-needed"
+      ],
+      "@stylistic/comma-dangle": [
+        "warn",
+        {
+          "arrays": "always-multiline",
+          "objects": "always-multiline",
+          "imports": "always",
+          "exports": "always-multiline",
+          "functions": "never"
+        }
+      ]
+    }
   },
   "browserslist": {
     "production": [
@@ -52,6 +129,9 @@
     ]
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^1.5.0",
+    "@stylistic/eslint-plugin-jsx": "^1.5.0",
+    "@stylistic/eslint-plugin-ts": "^1.5.0",
     "@types/lodash": "^4.14.202"
   }
 }
