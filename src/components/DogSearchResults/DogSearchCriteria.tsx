@@ -1,32 +1,23 @@
 import {
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
-} from "react";
-import _ from 'lodash';
-import DogBreedDropdown from "./DogBreedDropdown";
-
-import {
-    Dog,
-    DogLookupFilter,
-} from "../../api/shared/DogLookupInterfaces";
-import DogAgeRangeSelector from "./DogAgeRangeSelector";
-import {
     Button,
     SelectChangeEvent,
     Stack,
 } from "@mui/material";
 import {
-    GridRowSelectionModel,
-} from "@mui/x-data-grid";
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+import DogAgeRangeSelector from "./DogAgeRangeSelector";
+import DogBreedDropdown from "./DogBreedDropdown";
 import {
     DogLookupContext,
-    ErrorContext,
 } from "../../state/DogContext";
-import DogMatchDisplay, {
-    NoMatchFound,
-} from "./DogMatchDisplay";
+import {
+    DogLookupFilter,
+} from "../../api/shared/DogLookupInterfaces";
+import _ from 'lodash';
 
 const MenuProps = {
     PaperProps: {

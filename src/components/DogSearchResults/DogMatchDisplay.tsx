@@ -16,18 +16,18 @@ import {
     SxProps,
 } from "@mui/material";
 import {
+    forwardRef,
+    useMemo,
+} from "react";
+import {
     Dog,
 } from "../../api/shared/DogLookupInterfaces";
 import {
-    useMemo,
-    forwardRef,
-} from "react";
+    PrettifyAge,
+} from "../../utils/TextFormattingUtitilies";
 import {
     Theme,
 } from "@emotion/react";
-import {
-    PrettifyAge,
-} from "../../utils/TextFormattingUtitilies";
 import {
     TransitionProps,
 } from "@mui/material/transitions";

@@ -1,24 +1,24 @@
-import {
-    useMemo,
-} from 'react';
 import './App.css';
-import Authentication from './api/auth/Authentication';
-import DogFetchInterviewApi from './api/shared/DogFetchInterviewApi';
-import DogLookup from './api/data/DogLookup';
 import {
     AuthContext,
     DogLookupContext,
     ErrorContext,
 } from './state/DogContext';
-import connectionSettings from './Connection.json';
+import Authentication from './api/auth/Authentication';
+import ConnectionSettings from './Connection.json';
+import DogFetchInterviewApi from './api/shared/DogFetchInterviewApi';
+import DogLookup from './api/data/DogLookup';
+import DogSearchActivity from './components/DogSearchActivity';
 import ExceptionHandler from './api/shared/ExceptionHandler';
 import {
     RecoilRoot,
 } from 'recoil';
-import DogSearchActivity from './components/DogSearchActivity';
+import {
+    useMemo,
+} from 'react';
 
 function App() {
-    const api = useMemo(() => { return new DogFetchInterviewApi(connectionSettings.SERVER_URL); }, []);
+    const api = useMemo(() => { return new DogFetchInterviewApi(ConnectionSettings.SERVER_URL); }, []);
     const authLookup = useMemo(() => new Authentication(api), [api]);
     const dogLookup = useMemo(() => new DogLookup(api), [api]);
     const errorLookup = useMemo(() => new ExceptionHandler(api), [api]);

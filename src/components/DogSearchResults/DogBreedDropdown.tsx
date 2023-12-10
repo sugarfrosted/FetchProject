@@ -1,14 +1,11 @@
 import {
-    Theme,
-} from "@emotion/react";
-import {
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    MenuProps,
     Box,
     Chip,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    MenuProps,
+    Select,
     SelectChangeEvent,
     SxProps,
 } from "@mui/material";
@@ -16,6 +13,9 @@ import {
     ReactNode,
     useMemo,
 } from "react";
+import {
+    Theme,
+} from "@emotion/react";
 
 export default function DogBreedDropdown(props: DogBreedDropdownProps) {
     const dogBreeds = useMemo(() => props.dogBreeds, [props.dogBreeds]);
