@@ -2,8 +2,8 @@ import {
     Theme,
 } from "@emotion/react";
 import {
-    Box,
-    InputLabel,
+    FormControl,
+    FormLabel,
     Slider,
     SxProps,
 } from '@mui/material';
@@ -21,10 +21,10 @@ export default function DogAgeSlider(props: DogAgeRangeSelectorProps) {
 
     return (
     /* eslint-disable indent */
-      <Box sx={props.sx}>
-        <InputLabel id="lblSelectAge"
+      <FormControl sx={props.sx}>
+        <FormLabel id="lblSelectAge">Age Selection</FormLabel>
         <Slider
-          aria-labelledby=""
+          aria-labelledby="lblSelectAge"
           value={props.value}
           marks={marks}
           min={0}
@@ -32,7 +32,7 @@ export default function DogAgeSlider(props: DogAgeRangeSelectorProps) {
           onChange={props.handleChange}
           valueLabelDisplay="auto"
         />
-      </Box>
+      </FormControl>
     /* eslint-enable indent */
     );
 }
