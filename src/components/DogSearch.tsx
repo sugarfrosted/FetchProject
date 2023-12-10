@@ -74,7 +74,10 @@ export default function DogSearch(_props: dogSearchProps) {
     return (
     /* eslint-disable indent */
       <div>
-        <DogSearchCriteria updateFilterCallback={filterModel => { setActiveFilter(filterModel); } } activeSearchCriteria={activeFilter} rowSelectionModel={rowSelectionModel} />
+        <DogSearchCriteria
+          updateFilterCallback={filterModel => { setActiveFilter(filterModel); } }
+          activeSearchCriteria={activeFilter}
+          rowSelectionModel={rowSelectionModel} />
         <DogSearchResultsDataGrid
           onPaginationModelChange={onPaginationModelChange}
           onSortModelChange={onSortModelChange}
