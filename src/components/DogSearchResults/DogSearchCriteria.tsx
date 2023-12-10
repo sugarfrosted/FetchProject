@@ -40,12 +40,10 @@ export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) 
     const [dogBreeds, setDogBreeds] = useState<string[]>([]);
     const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
     const [selectedAgeRange, setSelectedAgeRange] = useState<number[]>([0, 32]);
-    const [dogMatch, setDogMatch] = useState<Dog>();
-    const [showNoMatch, setShowNoMatch] = useState(false);
     const [isClearing, setIsClearing] = useState(false);
-    const errorContext = useContext(ErrorContext);
     const dogLookup = useContext(DogLookupContext);
     const updateFilterCallback = props.updateFilterCallback;
+    const matchDisabled = useMemo(() => !!props.matchDisabled, [props.matchDisabled]);
 
     function clearFilter() {
         setSelectedBreeds([]);
@@ -96,25 +94,6 @@ export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) 
         setSelectedAgeRange(selection);
     };
 
-    async function findMatch(_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        var dogIds = (props.rowSelectionModel || []).map(gridRowId => gridRowId as string);
-        if (!dogIds) {
-            return;
-        }
-
-        try {
-            var dog = await dogLookup.GetMatch(dogIds);
-
-            if(dog) {
-                setDogMatch(dog);
-            } else{
-                setShowNoMatch(true);
-            }
-        } catch (error) {
-            errorContext.HandleError(error);
-        }
-    }
-
     return (
     /* eslint-disable indent */
       <>
@@ -128,13 +107,10 @@ export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) 
         <Stack direction={"column"}>
           <Button onClick={() => props.updateFilterCallback(currentFilterState)}>{hasFilterChanges ? "Update Filter" : "Rerun Search"}</Button>
           <Button onClick={clearFilter}>Clear Search</Button>
-          <Button onClick={findMatch} disabled={!props.rowSelectionModel || props.rowSelectionModel.length === 0}>Find Match</Button>
+          {props.findMatchClickHandler && (
+            <Button onClick={props.findMatchClickHandler} disabled={matchDisabled}>Find Match</Button>)
+          }
         </Stack>
-        <DogMatchDisplay
-          match={dogMatch}
-          open={!!dogMatch}
-          onClose={() => setDogMatch(undefined!)}/>
-        <NoMatchFound open={showNoMatch} handleClose={() => { setShowNoMatch(false); }} />
       </>
     /* eslint-disable indent */
     );
@@ -143,5 +119,6 @@ export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) 
 interface DogSearchCriteriaControlProps {
     updateFilterCallback: (filterModel: DogLookupFilter) => void;
     activeSearchCriteria: DogLookupFilter;
-    rowSelectionModel?: GridRowSelectionModel;
+    findMatchClickHandler?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+    matchDisabled?: boolean;
 }

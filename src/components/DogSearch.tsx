@@ -31,8 +31,11 @@ export default function DogSearch(_props: dogSearchProps) {
     const [nextPagingQuery, setNextPagingQuery] = useState<string | undefined>();
     const [prevPagingQuery, setPrevPagingQuery] = useState<string | undefined>();
     const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>();
+    const [dogMatch, setDogMatch] = useState<Dog>();
+    const [showNoMatch, setShowNoMatch] = useState(false);
 
     const dogLookup = useContext(DogLookupContext);
+    const errorContext = useContext(ErrorContext);
 
     async function LoadDogs(sortModel: GridSortModel, pageModel: GridPaginationModel, filter?: DogLookupFilter | undefined | null) {
         var queryParams: DogLookupParams = {};
