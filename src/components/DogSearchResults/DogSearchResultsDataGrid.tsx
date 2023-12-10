@@ -1,9 +1,8 @@
 import {
-    Image
+    Image,
 } from '@mui/icons-material';
 import {
-    IconButton,
-    Popover
+    Icon,
 } from '@mui/material';
 import {
     DataGrid,
@@ -43,6 +42,7 @@ import {
 import {
     PrettifyAge,
 } from '../../utils/TextFormattingUtitilies';
+import DogImagePopover from './DogImagePopover';
 
 export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps) {
     const columns: GridColDef[] = [
@@ -54,11 +54,11 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
         { field: 'breed', headerName: 'Breed', sortable: true, hideable: false, filterable: false, disableColumnMenu: true, flex: 1 },
     ];
 
-    const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const [pageModel, setPageModel] = useState<GridPaginationModel>({page: 0, pageSize: 25});
     const [isLoading, setIsLoading] = useState(false);
     const apiRef = useGridApiRef();
-    const [dogImageUrl, setDogImageUrl] = useState("");
+    const [depictedDog, setDepictedDog] = useState<Dog | null>(null);
     const propsOnFilterModelChange = useMemo(() => props.onFilterModelChange, [props.onFilterModelChange]);
     const errorContext = useContext(ErrorContext);
     const setLoginState = useSetRecoilState(userLoginState);
@@ -66,19 +66,25 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
 
     function getDogImageAnchor(data: GridRenderCellParams) : any {
-        // var handlePopoverOpen = getHandlePopoverOpen(data.value)
-        // return <IconButton onClick={handlePopoverOpen} onMouseLeave={handlePopoverClose}><Image/></IconButton>
+        return (<Icon><Image/></Icon>);
     }
 
-    const getHandlePopoverOpen = (url: string ) => {
-        return (event: React.MouseEvent<HTMLElement>) => {
-            setDogImageUrl(url);
+    const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+        const field = event.currentTarget.dataset.field! as keyof Dog | undefined;
+        if (field !== 'img') {
+            return;
+        }
+        const id = event.currentTarget.parentElement!.dataset.id!;
+        const row = props.rows.find(r => r.id === id)!;
+        if (row) {
+            setDepictedDog(row);
             setAnchorEl(event.currentTarget);
-        };
+        }
     };
 
     const handlePopoverClose = () => {
-    //setAnchorEl(null);
+        setAnchorEl(null);
+        setDepictedDog(null);
     };
 
     const handleError = useCallback(async function handleError(error: unknown) {
@@ -182,26 +188,19 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
           sortingMode='server'
           autoHeight
           pageSizeOptions={[5, 10, 25, 50]}
+          slotProps={{
+            cell: {
+              onMouseEnter: handlePopoverOpen,
+              onMouseLeave: handlePopoverClose,
+            },
+          }}
         />
-        <Popover
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-          open={!!anchorEl}
-          anchorEl={anchorEl}
-        >
-          The content of the Popover.
-        </Popover>
+        <DogImagePopover dog={depictedDog} anchorEl={anchorEl} onClose={handlePopoverClose}/>
+
       </>
     /* eslint-enable indent */
     );
 }
-
 
 export interface DogSearchResultsDataGridProps {
     onPaginationModelChange?: (model: GridPaginationModel, details: GridCallbackDetails<any>, previousModel: GridPaginationModel, sortModel: GridSortModel) => Promise<GridPaginationModel>;
