@@ -15,11 +15,11 @@ import {
     useState,
 } from "react";
 import {
-    validate as isValidEmail,
-} from "email-validator";
-import {
     AuthContext,
 } from "../state/DogContext";
+import {
+    validate as isValidEmail,
+} from "email-validator";
 
 
 export default function LoginPane(params: loginPaneParams) {

@@ -1,10 +1,4 @@
 import {
-    Image,
-} from '@mui/icons-material';
-import {
-    Icon,
-} from '@mui/material';
-import {
     DataGrid,
     GridCallbackDetails,
     GridColDef,
@@ -17,32 +11,38 @@ import {
     useGridApiRef,
 } from '@mui/x-data-grid';
 import {
+    Dog,
+    DogLookupFilter,
+} from '../../api/shared/DogLookupInterfaces';
+import {
     useCallback,
     useContext,
     useEffect,
     useMemo,
     useState,
 } from 'react';
+import DogImagePopover from './DogImagePopover';
 import {
-    Dog,
-    DogLookupFilter,
-} from '../../api/shared/DogLookupInterfaces';
+    ErrorContext,
+} from '../../state/DogContext';
 import {
     GridApiCommunity,
 } from '@mui/x-data-grid/internals';
 import {
-    ErrorContext,
-} from '../../state/DogContext';
+    Icon,
+} from '@mui/material';
+import {
+    Image,
+} from '@mui/icons-material';
+import {
+    PrettifyAge,
+} from '../../utils/TextFormattingUtitilies';
 import {
     useSetRecoilState,
 } from 'recoil';
 import {
     userLoginState,
 } from '../../state/atoms';
-import {
-    PrettifyAge,
-} from '../../utils/TextFormattingUtitilies';
-import DogImagePopover from './DogImagePopover';
 
 export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps) {
     const columns: GridColDef[] = [
@@ -196,7 +196,6 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
           }}
         />
         <DogImagePopover dog={depictedDog} anchorEl={anchorEl} onClose={handlePopoverClose}/>
-
       </>
     /* eslint-enable indent */
     );

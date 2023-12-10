@@ -1,27 +1,31 @@
 import {
-    MutableRefObject,
-    useContext,
-    useState,
-} from "react";
-import DogSearchResultsDataGrid from "./DogSearchResults/DogSearchResultsDataGrid";
-import {
-    GridPaginationModel,
-    GridCallbackDetails,
-    GridSortModel,
-    GridRowSelectionModel,
-} from "@mui/x-data-grid";
-import {
     Dog,
     DogLookupFilter,
     DogLookupParams,
 } from "../api/shared/DogLookupInterfaces";
 import {
+    DogLookupContext,
+    ErrorContext,
+} from "../state/DogContext";
+import DogMatchDisplay, {
+    DogMatchButtonIds,
+} from "./DogSearchResults/DogMatchDisplay";
+import {
+    GridCallbackDetails,
+    GridPaginationModel,
+    GridRowSelectionModel,
+    GridSortModel,
+} from "@mui/x-data-grid";
+import {
+    MutableRefObject,
+    useContext,
+    useState,
+} from "react";
+import DogSearchCriteria from "./DogSearchResults/DogSearchCriteria";
+import DogSearchResultsDataGrid from "./DogSearchResults/DogSearchResultsDataGrid";
+import {
     GridApiCommunity,
 } from "@mui/x-data-grid/internals";
-import {
-    DogLookupContext,
-} from "../state/DogContext";
-import DogSearchCriteria from "./DogSearchResults/DogSearchCriteria";
 
 
 export default function DogSearch(_props: dogSearchProps) {
@@ -32,7 +36,7 @@ export default function DogSearch(_props: dogSearchProps) {
     const [prevPagingQuery, setPrevPagingQuery] = useState<string | undefined>();
     const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>();
     const [dogMatch, setDogMatch] = useState<Dog>();
-    const [showNoMatch, setShowNoMatch] = useState(false);
+    const [showMatchPopup, setShowMatchPopup] = useState(false);
 
     const dogLookup = useContext(DogLookupContext);
     const errorContext = useContext(ErrorContext);

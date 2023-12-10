@@ -3,23 +3,23 @@ import { AccountCircle,
 } from "@mui/icons-material";
 import {
     AppBar,
-    Toolbar,
-    Typography,
     Button,
     IconButton,
     Menu,
     MenuItem,
+    Toolbar,
     Tooltip,
+    Typography,
 } from "@mui/material";
 import {
     useContext,
     useEffect,
     useState,
 } from "react";
-import Authentication from "../api/auth/Authentication";
 import {
     AuthContext,
 } from "../state/DogContext";
+import Authentication from "../api/auth/Authentication";
 import {
     useRecoilValue,
 } from "recoil";

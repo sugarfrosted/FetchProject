@@ -1,9 +1,9 @@
+import Authentication from '../api/auth/Authentication';
+import DogLookup from '../api/data/DogLookup';
+import ErrorHandler from '../api/shared/ExceptionHandler';
 import {
     createContext,
 } from 'react';
-import DogLookup from '../api/data/DogLookup';
-import Authentication from '../api/auth/Authentication';
-import ErrorHandler from '../api/shared/ExceptionHandler';
 
 export const DogLookupContext = createContext(null! as DogLookup);
 export const AuthContext = createContext(null! as Authentication);

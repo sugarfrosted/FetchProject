@@ -1,19 +1,19 @@
-import {
-    useState,
-} from 'react';
 import '../App.css';
 import {
     Box,
     Container,
 } from '@mui/material';
-import LoginPane from './LoginPane';
-import TopBar from './TopBar';
+import Authentication from '../api/auth/Authentication';
 import DogGreeting from './DogGreeting';
 import DogSearch from './DogSearch';
-import Authentication from '../api/auth/Authentication';
+import LoginPane from './LoginPane';
+import TopBar from './TopBar';
 import {
     useRecoilState,
 } from 'recoil';
+import {
+    useState,
+} from 'react';
 import {
     userLoginState,
 } from '../state/atoms';

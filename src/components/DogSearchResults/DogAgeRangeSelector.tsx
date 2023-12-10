@@ -1,12 +1,12 @@
 import {
-    Theme,
-} from "@emotion/react";
-import {
     FormControl,
     FormLabel,
     Slider,
     SxProps,
 } from '@mui/material';
+import {
+    Theme,
+} from "@emotion/react";
 
 export default function DogAgeSlider(props: DogAgeRangeSelectorProps) {
     const marks = [
