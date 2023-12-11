@@ -1,7 +1,11 @@
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
     Button,
     SelectChangeEvent,
     Stack,
+    Typography,
 } from "@mui/material";
 import {
     useContext,
@@ -17,6 +21,9 @@ import {
 import {
     DogLookupFilter,
 } from "../../api/shared/DogLookupInterfaces";
+import {
+    GridExpandMoreIcon,
+} from "@mui/x-data-grid";
 import Settings from "../../Configuration.json";
 import _ from 'lodash';
 
@@ -92,30 +99,41 @@ export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) 
         setSelectedAgeRange(selection);
     };
 
+    function onAccordionExpansionChange(_event: React.SyntheticEvent, isExpanded: boolean) {
+        if (!isExpanded && hasFilterChanges) {
+            updateFilterCallback(currentFilterState);
+        }
+    }
+
     return (
     /* eslint-disable indent */
-      <>
-        <div style={{display: "flex"}}>
-          <div style={{flex: 1, paddingLeft: '1em', paddingRight: '1em'}}>
-            <DogBreedDropdown sx={{ m: 1, width: "100%", mt: 3 }}
-              dogBreeds={dogBreeds}
-              selectedBreeds={selectedBreeds}
-              handleChange={handleDogBreedDropdownChange}
-              menuProps={MenuProps}
-            />
+      <Accordion defaultExpanded onChange={onAccordionExpansionChange}>
+        <AccordionSummary sx={{backgroundColor: "#1976D2", color: "white"}} aria-controls="panel1d-content" id="panel1d-header" expandIcon={<GridExpandMoreIcon sx={{color: "white"}}/>}>
+          <Typography>Filter Settings</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <div style={{display: "flex"}}>
+            <div style={{flex: 1, paddingLeft: '1em', paddingRight: '1em'}}>
+              <DogBreedDropdown sx={{ m: 1, width: "100%", mt: 3 }}
+                dogBreeds={dogBreeds}
+                selectedBreeds={selectedBreeds}
+                handleChange={handleDogBreedDropdownChange}
+                menuProps={MenuProps}
+              />
+            </div>
+            <div style={{flex: 1, paddingLeft: '2em', paddingRight: '4em'}}>
+              <DogAgeRangeSelector sx={{ m: 1, width: "100%", mt: 3}} handleChange={handleDogAgeChange} value={selectedAgeRange} />
+            </div>
           </div>
-          <div style={{flex: 1, paddingLeft: '2em', paddingRight: '4em'}}>
-            <DogAgeRangeSelector sx={{ m: 1, width: "100%", mt: 3}} handleChange={handleDogAgeChange} value={selectedAgeRange} />
-          </div>
-        </div>
-        <Stack direction={"row"}>
-          <Button onClick={() => props.updateFilterCallback(currentFilterState)}>{hasFilterChanges ? "Update Filter" : "Rerun Search"}</Button>
-          <Button onClick={clearFilter}>Clear Search</Button>
-          {props.findMatchClickHandler && (
-            <Button onClick={props.findMatchClickHandler} disabled={matchDisabled}>Find Match</Button>)
-          }
-        </Stack>
-      </>
+          <Stack direction={"row"}>
+            <Button onClick={() => props.updateFilterCallback(currentFilterState)}>{hasFilterChanges ? "Update Filter" : "Rerun Search"}</Button>
+            <Button onClick={clearFilter}>Clear Search</Button>
+            {props.findMatchClickHandler && (
+              <Button onClick={props.findMatchClickHandler} disabled={matchDisabled}>Find Match</Button>)
+            }
+          </Stack>
+        </AccordionDetails>
+      </Accordion>
     /* eslint-disable indent */
     );
 }
