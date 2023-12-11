@@ -1,10 +1,4 @@
 import {
-    Accordion,
-    AccordionDetails,
-    AccordionSummary,
-    Typography,
-} from "@mui/material";
-import {
     Dog,
     DogLookupFilter,
     DogLookupParams,
@@ -18,7 +12,6 @@ import DogMatchDisplay, {
 } from "./DogSearchResults/DogMatchDisplay";
 import {
     GridCallbackDetails,
-    GridExpandMoreIcon,
     GridPaginationModel,
     GridRowSelectionModel,
     GridSortModel,
@@ -89,24 +82,17 @@ export default function DogSearch(_props: dogSearchProps) {
     return (
     /* eslint-disable indent */
       <div>
-        <Accordion>
-          <AccordionSummary sx={{backgroundColor: "#1976D2", color: "white"}} aria-controls="panel1d-content" id="panel1d-header" expandIcon={<GridExpandMoreIcon sx={{color: "white"}}/>}>
-            <Typography>Filter Settings</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <DogSearchCriteria
-              updateFilterCallback={(filterModel: DogLookupFilter, isClearing: boolean = false) => {
-                setActiveFilter(filterModel);
-                if (isClearing) {
-                    setRowSelectionModel([]);
-                }
-              }}
-            activeSearchCriteria={activeFilter}
-            findMatchClickHandler={findMatch}
-            matchDisabled={!rowSelectionModel || rowSelectionModel.length === 0}
-            />
-          </AccordionDetails>
-        </Accordion>
+        <DogSearchCriteria
+          updateFilterCallback={(filterModel: DogLookupFilter, isClearing: boolean = false) => {
+            setActiveFilter(filterModel);
+            if (isClearing) {
+              setRowSelectionModel([]);
+            }
+          }}
+          activeSearchCriteria={activeFilter}
+          findMatchClickHandler={findMatch}
+          matchDisabled={!rowSelectionModel || rowSelectionModel.length === 0}
+        />
         <DogSearchResultsDataGrid
           onPaginationModelChange={onPaginationModelChange}
           onSortModelChange={onSortModelChange}
