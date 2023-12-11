@@ -3,17 +3,22 @@ import {
     Box,
     Container,
 } from '@mui/material';
+import {
+    useCallback,
+    useContext,
+    useState,
+} from 'react';
 import Authentication from '../api/auth/Authentication';
 import DogGreeting from './DogGreeting';
 import DogSearch from './DogSearch';
+import {
+    ErrorContext,
+} from '../state/DogContext';
 import LoginPane from './LoginPane';
 import TopBar from './TopBar';
 import {
     useRecoilState,
 } from 'recoil';
-import {
-    useState,
-} from 'react';
 import {
     userLoginState,
 } from '../state/atoms';
@@ -21,6 +26,8 @@ import {
 function DogSearchActivity() {
     const [loginPaneOpen, setLoginPaneOpen] = useState(false);
     const [loginState, setLoginState] = useRecoilState(userLoginState);
+    const errorContext = useContext(ErrorContext);
+    const errorCallback = useCallback(() => { setLoginState( {userName: null, email: null, loginStatus: false} );}, [setLoginState]);
 
     function onLoginSuccessHandler(name: string, email: string) : void {
         setLoginState({userName: name, email: email, loginStatus: true });
@@ -31,7 +38,7 @@ function DogSearchActivity() {
     }
 
     const logoutClickedHandler = async (authLookup: Authentication) => {
-        await authLookup.Logout().then(() => {}, _rejection => {});
+        await authLookup.Logout().catch(_error => errorContext.HandleError(_error, errorCallback));
     };
 
     const loginClickedHandler = () => {

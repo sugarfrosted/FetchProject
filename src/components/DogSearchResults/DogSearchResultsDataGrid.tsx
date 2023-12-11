@@ -186,8 +186,7 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
           onRowSelectionModelChange={props.onRowSelectionModelChange}
           rowSelectionModel={props.selection}
           sortingMode='server'
-          autoHeight
-          pageSizeOptions={[5, 10, 25, 50]}
+          pageSizeOptions={[5, 10, 25, 50, 100]}
           slotProps={{
             cell: {
               onMouseEnter: handlePopoverOpen,

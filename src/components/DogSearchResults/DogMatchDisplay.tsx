@@ -70,7 +70,7 @@ export function DogMatchPopup(props: DogMatchDisplayProps) {
           <CardHeader title={props.match.name} subheader="Your new best friend!" />
           <CardMedia
             component="img"
-            alt="The house from the offer."
+            alt={`Your new best friend: ${props.match.name}`}
             src={props.match.img} />
           <CardContent>
             <Stack direction="row" flexDirection="row">
@@ -82,7 +82,7 @@ export function DogMatchPopup(props: DogMatchDisplayProps) {
           <CardActions>
             <Button id={'btnCloseSearchResult' as DogMatchButtonIds} onClick={props.onClose}>Search for another dog</Button>
           </CardActions>
-        </Card>)
+        </Card>
       </Dialog>
     /* eslint-enable indent */
     );

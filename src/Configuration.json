@@ -1,0 +1,8 @@
+{
+    "CONNECTION": {
+        "SERVER_URL": "https://frontend-take-home-service.fetch.com"
+    },
+    "DOG_SEARCH": {
+        "MAX_AGE": 15
+    }
+}
