@@ -52,25 +52,25 @@
           "after": true
         }
       ],
-      "curly": "error",
+      "curly": "warn",
       "indent": [
         "warn"
       ],
       "@stylistic/ts/comma-spacing": [
-        "error",
+        "warn",
         {
           "before": false,
           "after": true
         }
       ],
       "@stylistic/ts/space-infix-ops": [
-        "error",
+        "warn",
         {
           "int32Hint": false
         }
       ],
       "@stylistic/ts/brace-style": [
-        "error",
+        "warn",
         "1tbs",
         {
           "allowSingleLine": true
@@ -84,7 +84,7 @@
           "indentLogicalExpressions": true
         }
       ],
-      "@stylistic/no-trailing-spaces": "warn",
+      "@stylistic/no-trailing-spaces": "error",
       "switch-colon-spacing": [
         "warn",
         {
@@ -114,7 +114,7 @@
           "functions": "never"
         }
       ],
-      "sort-imports": ["error", {
+      "sort-imports": ["warn", {
           "ignoreCase": false,
           "ignoreDeclarationSort": false,
           "ignoreMemberSort": false,
