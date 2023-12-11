@@ -105,7 +105,8 @@ export default function DogSearch(_props: dogSearchProps) {
         <DogMatchDisplay
           match={dogMatch}
           open={showMatchPopup}
-          onClose={onCloseDogMatchPopup} />
+          onClose={onCloseDogMatchPopup}
+          sx={{maxHeight: "50em", flexGrow: 1}} />
       </div>
     /* eslint-enable indent */
     );

@@ -36,9 +36,8 @@ export default function DogBreedDropdown(props: DogBreedDropdownProps) {
     return (
     /* eslint-disable indent */
       <FormControl sx={props.sx}>
-        <InputLabel id="lblSelectBreeds" >Breed</InputLabel>
+        <InputLabel htmlFor="selSelectBreeds" >Breed</InputLabel>
         <Select
-          labelId="lblSelectBreeds"
           multiple
           id="selSelectBreeds"
           value={props.selectedBreeds}
