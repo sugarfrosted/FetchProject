@@ -2,6 +2,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Configuration.json
+* DOG_SEARCH.MAX_AGE: This controls what the max age that's treated as "include all dogs". If I had control over the API this would be a supported call.
+* CONNECTION.SERVER_URL: THis is the url of the API provided. While in this specific project this will never need to change in a production setting this would need to be configurable. Normally this would be handled with secrets, given hosting limitations this is just listed in the configuration.
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -15,6 +19,8 @@ The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
 ### `npm test`
+
+Note: This is not currently implemented
 
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
