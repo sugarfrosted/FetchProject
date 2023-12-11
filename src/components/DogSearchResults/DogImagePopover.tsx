@@ -8,9 +8,7 @@ import {
     Dog,
 } from '../../api/shared/DogLookupInterfaces';
 
-export default function DogImagePopover(props: { dog: Dog | null; anchorEl: Element | null; onClose: () => void; }) {
-
-    const open = Boolean(props.anchorEl);
+export default function DogImagePopover(props: { dog: Dog | null; anchorEl: Element | null; open: boolean; onClose: () => void; }) {
 
     return (
     /* eslint-disable indent */
@@ -19,7 +17,7 @@ export default function DogImagePopover(props: { dog: Dog | null; anchorEl: Elem
         sx={{
           pointerEvents: 'none',
         }}
-        open={open}
+        open={props.open}
         anchorEl={props.anchorEl}
         anchorOrigin={{
           vertical: 'top',
@@ -32,21 +30,23 @@ export default function DogImagePopover(props: { dog: Dog | null; anchorEl: Elem
         onClose={props.onClose}
         disableRestoreFocus
         >
-        <Paper
-            aria-labelledby='popupDogName'
-            sx={{ padding: "5px", alignContent: "right", border: 'thin', borderColor: 'black' }}
-            elevation={4}
-          >
-          <Typography variant='h4' id='popupDogName'>{props.dog?.name || "No dog"}</Typography>
-          <Box
-            component="img"
-            sx={{
-              width: "17em",
-              maxheight: "20em",
-            }}
-            alt={`Depicted: ${props.dog?.name}$`}
-            src={props.dog?.img} />
-        </Paper>
+        { props.dog &&
+          <Paper
+              aria-labelledby='popupDogName'
+              sx={{ padding: "5px", alignContent: "right", border: 'thin', borderColor: 'black' }}
+              elevation={4}
+            >
+            <Typography variant='h4' id='popupDogName'>{props.dog.name}</Typography>
+            <Box
+              component="img"
+              sx={{
+                width: "17em",
+                maxheight: "20em",
+              }}
+              alt={`Depicted: ${props.dog.name}$`}
+              src={props.dog?.img} />
+          </Paper>
+        }
       </Popover>
     /* eslint-enable indent */
     );

@@ -1,16 +1,15 @@
 import {
-    Box,
     Button,
     Card,
     CardActions,
     CardContent,
     CardHeader,
-    CardMedia,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Paper,
     Slide,
     Stack,
     SxProps,
@@ -22,6 +21,9 @@ import {
 import {
     Dog,
 } from "../../api/shared/DogLookupInterfaces";
+import {
+    LabelValueBox,
+} from "../LabelValueBox";
 import {
     PrettifyAge,
 } from "../../utils/TextFormattingUtitilies";
@@ -62,21 +64,23 @@ export function DogMatchPopup(props: DogMatchDisplayProps) {
     if(!props.match) {
         return <></>;
     }
+    var sx = props.sx || {flexGrow: 1};
 
     return (
     /* eslint-disable indent */
-      <Dialog sx={props.sx} open={!!props.match && props.open} TransitionComponent={Transition}>
+      <Dialog open={!!props.match && props.open} TransitionComponent={Transition}>
         <Card title={props.match.name}>
           <CardHeader title={props.match.name} subheader="Your new best friend!" />
-          <CardMedia
-            component="img"
-            alt={`Your new best friend: ${props.match.name}`}
-            src={props.match.img} />
-          <CardContent>
-            <Stack direction="row" flexDirection="row">
-              <Box flex={1}><label id="matchBreed" >Breed:</label><span aria-labelledby="matchBreed">{props.match.breed}</span></Box>
-              <Box flex={1}><label id="matchAge">Age:</label><span aria-labelledby="matchAge">{displayAge}</span></Box>
-              <Box flex={1}><label id="matchZip" >Location:</label><span aria-labelledby="matchZip">{props.match.zip_code}</span></Box>
+          <CardContent sx={sx}>
+            <Paper
+              sx={{margin: "10px", padding: "5px", width: "15em"}}
+              component="img"
+              alt={`Your new best friend: ${props.match.name}`}
+              src={props.match.img} />
+            <Stack direction="row" flexDirection="row" flexWrap="wrap" margin={"10px"}>
+              <LabelValueBox labelId={"matchBreed"} label="Breed" value={props.match.breed} />
+              <LabelValueBox labelId={"matchAge"} label="Age" value={displayAge} />
+              <LabelValueBox labelId={"matchZip"} label="Zip" value={props.match.zip_code} />
             </Stack>
           </CardContent>
           <CardActions>

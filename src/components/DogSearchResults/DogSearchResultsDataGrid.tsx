@@ -64,6 +64,12 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
     const setLoginState = useSetRecoilState(userLoginState);
     const errorCallback = useCallback(() => { setLoginState( {userName: null, email: null, loginStatus: false} );}, [setLoginState]);
 
+    useEffect(() => {
+        if (!anchorEl) {
+            setDepictedDog(null);
+        }
+    }, [anchorEl]);
+
 
     function getDogImageAnchor(data: GridRenderCellParams) : any {
         return (<Icon><Image/></Icon>);
@@ -84,7 +90,6 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
     const handlePopoverClose = () => {
         setAnchorEl(null);
-        setDepictedDog(null);
     };
 
     const handleError = useCallback(async function handleError(error: unknown) {
@@ -194,7 +199,7 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
             },
           }}
         />
-        <DogImagePopover dog={depictedDog} anchorEl={anchorEl} onClose={handlePopoverClose}/>
+        <DogImagePopover open={!!anchorEl} dog={depictedDog} anchorEl={anchorEl} onClose={handlePopoverClose}/>
       </>
     /* eslint-enable indent */
     );
