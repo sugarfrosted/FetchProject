@@ -1,11 +1,11 @@
-import DogFetchInterviewApi, {
-    dogParams,
-} from "../shared/DogFetchInterviewApi";
 import {
     Dog,
     DogLookupParams,
     DogsSearchResult,
 } from "../shared/DogLookupInterfaces";
+import DogFetchInterviewApi, {
+    dogParams,
+} from "../shared/DogFetchInterviewApi";
 import {
     GridSortModel,
 } from "@mui/x-data-grid";
