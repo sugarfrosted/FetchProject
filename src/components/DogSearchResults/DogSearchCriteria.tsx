@@ -95,13 +95,19 @@ export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) 
     return (
     /* eslint-disable indent */
       <>
-        <DogBreedDropdown sx={{ m: 1, width: "100%", mt: 3 }}
-          dogBreeds={dogBreeds}
-          selectedBreeds={selectedBreeds}
-          handleChange={handleDogBreedDropdownChange}
-          menuProps={MenuProps}
-        />
-        <DogAgeRangeSelector sx={{ m: 1, width: "100%", mt: 3 }} handleChange={handleDogAgeChange} value={selectedAgeRange} />
+        <div style={{display: "flex"}}>
+          <div style={{flex: 1, paddingLeft: '1em', paddingRight: '1em'}}>
+            <DogBreedDropdown sx={{ m: 1, width: "100%", mt: 3 }}
+              dogBreeds={dogBreeds}
+              selectedBreeds={selectedBreeds}
+              handleChange={handleDogBreedDropdownChange}
+              menuProps={MenuProps}
+            />
+          </div>
+          <div style={{flex: 1, paddingLeft: '2em', paddingRight: '4em'}}>
+            <DogAgeRangeSelector sx={{ m: 1, width: "100%", mt: 3}} handleChange={handleDogAgeChange} value={selectedAgeRange} />
+          </div>
+        </div>
         <Stack direction={"row"}>
           <Button onClick={() => props.updateFilterCallback(currentFilterState)}>{hasFilterChanges ? "Update Filter" : "Rerun Search"}</Button>
           <Button onClick={clearFilter}>Clear Search</Button>
