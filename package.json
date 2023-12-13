@@ -114,13 +114,21 @@
           "functions": "never"
         }
       ],
+      "no-console": ["error", {
+        "allow": [
+          "warn",
+          "error"
+          ]
+        }
+      ],
       "sort-imports": ["warn", {
           "ignoreCase": false,
           "ignoreDeclarationSort": false,
           "ignoreMemberSort": false,
           "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
           "allowSeparatedGroups": true
-      }]
+        }
+      ]
     }
   },
   "browserslist": {

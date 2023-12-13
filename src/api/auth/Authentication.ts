@@ -13,10 +13,20 @@ export default class Authentication {
         this._api = api;
     }
 
+    /**
+     * Login handler.
+     * @param name Username input by user.
+     * @param email Email input by user.
+     * @returns Promise containing the login data if successful.
+     */
     public async Login(name: string, email: string): Promise<{ name: string; email: string; isLoggedIn: boolean; }> {
         return this._api.Post_Auth_Login(name, email);
     }
 
+    /**
+     * Logout handler.
+     * @returns A successful promise if logout is successful.
+     */
     public async Logout(): Promise<void> {
         return this._api.Post_Auth_Logout();
     }

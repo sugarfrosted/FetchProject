@@ -28,6 +28,13 @@ import {
 } from "@mui/x-data-grid/internals";
 
 
+/** The dog search application. This handles the dog search assuming the user is logged in.
+ *  This assumes that a containing layer has the following contexts defined:
+ * - DogLookupContext
+ * - Authentication
+ * - ErrorHandler
+ * - RecoilRoot
+ */
 export default function DogSearch(_props: dogSearchProps) {
     const [activeFilter, setActiveFilter] = useState<DogLookupFilter>({});
     const [rows, setRows] = useState<Dog[]>([]);

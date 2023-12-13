@@ -8,6 +8,11 @@ import {
     Dog,
 } from '../../api/shared/DogLookupInterfaces';
 
+/**
+ * Popover to show dog images in the dog search result data grid.
+ * @param props Popover properties and handlers
+ * @returns The a popover to be displayed in the dog search result data grid on the image column.
+ */
 export default function DogImagePopover(props: { dog: Dog | null; anchorEl: Element | null; open: boolean; onClose: () => void; }) {
 
     return (

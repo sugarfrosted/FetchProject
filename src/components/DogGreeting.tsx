@@ -2,6 +2,7 @@ import {
     Typography,
 } from "@mui/material";
 
+/**Pre-login greating page */
 export default function DogGreeting() {
     return (
     /* eslint-disable indent */

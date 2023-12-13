@@ -39,6 +39,7 @@ const MenuProps = {
     },
 };
 
+/**Control to show the criteria for the dog search closed in an accordion to give more room for the results. */
 export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) {
     const locationSearchRef = useRef<{clear: () => void}>(null);
     const dogLookup = useContext(DogLookupContext);

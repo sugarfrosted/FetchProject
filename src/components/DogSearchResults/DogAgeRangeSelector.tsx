@@ -15,6 +15,11 @@ import {
     useMemo,
 } from 'react';
 
+/**
+ * DogAgeSliderControl
+ * @param props Props for the selector
+ * @returns A slider for selecting ages for dogs in the search.
+ */
 export default function DogAgeSlider(props: DogAgeRangeSelectorProps) {
     const max_age = useMemo(() => {
         var maxAge = ((Settings.DOG_SEARCH) && (Settings.DOG_SEARCH.MAX_AGE)) || 0;
