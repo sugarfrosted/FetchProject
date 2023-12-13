@@ -9,21 +9,21 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Grid,
     Paper,
     Slide,
     Stack,
     SxProps,
 } from "@mui/material";
 import {
+    CSSProperties,
+    ReactNode,
     forwardRef,
     useMemo,
 } from "react";
 import {
     Dog,
 } from "../../api/shared/DogLookupInterfaces";
-import {
-    LabelValueBox,
-} from "../LabelValueBox";
 import {
     PrettifyAge,
 } from "../../utils/TextFormattingUtitilies";
@@ -80,9 +80,9 @@ export function DogMatchPopup(props: DogMatchDisplayProps) {
               alt={`Your new best friend: ${props.match.name}`}
               src={props.match.img} />
             <Stack direction="row" flexDirection="row" flexWrap="wrap" margin={"10px"}>
-              <LabelValueBox labelId={"matchBreed"} label="Breed" value={props.match.breed} />
-              <LabelValueBox labelId={"matchAge"} label="Age" value={displayAge} />
-              <LabelValueBox labelId={"matchZip"} label="Zip" value={props.match.zip_code} />
+              <DogMatchDisplayLabelValueBox labelId={"matchBreed"} label="Breed" value={props.match.breed} />
+              <DogMatchDisplayLabelValueBox labelId={"matchAge"} label="Age" value={displayAge} />
+              <DogMatchDisplayLabelValueBox labelId={"matchZip"} label="Zip" value={props.match.zip_code} />
             </Stack>
           </CardContent>
           <CardActions>
@@ -116,7 +116,49 @@ export function NoMatchFound(props: PopupProps){
     );
 }
 
+/**Label and value pairs for showing the details about the matched dog in the results page. */
+export function DogMatchDisplayLabelValueBox(props: DogMatchDisplayLabelValueProps) {
+    var label = typeof props.label === 'string' ? props.label + ":" : props.label;
+    var labelReading = typeof props.label === 'string' ? props.label : undefined;
+    var flex = typeof props.flex === 'undefined' ? 1 : props.flex ?? undefined;
+    var labelStyle = props.labelStyle || {fontWeight: "bold"};
+
+    return (
+    /* eslint-disable indent */
+      <Grid item xs="auto"
+        margin={"10px"}
+        alignContent="center"
+        flex={flex}>
+        <label
+            style={labelStyle}
+            id={props.labelId}
+            aria-label={labelReading}
+        >
+          {label}
+        </label>
+        <span
+          style={props.valueStyle}
+          aria-labelledby={props.labelId}
+        >
+          {props.value}
+        </span>
+      </Grid>
+    /* eslint-disable indent */
+    );
+}
+
+
 export type DogMatchButtonIds = 'btnCloseNoMatchFound' | 'btnCloseSearchResult';
+
+
+interface DogMatchDisplayLabelValueProps {
+    labelId: string;
+    label: string | ReactNode;
+    value: string | ReactNode;
+    labelStyle?: CSSProperties;
+    valueStyle?: CSSProperties;
+    flex?: number | null;
+};
 
 interface DogMatchDisplayProps extends PopupProps {
     match: Dog | undefined;
