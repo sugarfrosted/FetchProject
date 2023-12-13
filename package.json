@@ -6,6 +6,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.8",
+    "@mui/base": "^5.0.0-beta.27",
     "@mui/icons-material": "^5.14.18",
     "@mui/material": "^5.14.17",
     "@mui/utils": "^5.14.18",
@@ -92,8 +93,7 @@
           "before": false
         }
       ],
-      "@stylistic/no-tabs":
-      [
+      "@stylistic/no-tabs": [
         "warn"
       ],
       "@stylistic/linebreak-style": [
@@ -114,18 +114,27 @@
           "functions": "never"
         }
       ],
-      "no-console": ["error", {
-        "allow": [
-          "warn",
-          "error"
+      "no-console": [
+        "error",
+        {
+          "allow": [
+            "warn",
+            "error"
           ]
         }
       ],
-      "sort-imports": ["warn", {
+      "sort-imports": [
+        "warn",
+        {
           "ignoreCase": false,
           "ignoreDeclarationSort": false,
           "ignoreMemberSort": false,
-          "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
+          "memberSyntaxSortOrder": [
+            "none",
+            "all",
+            "multiple",
+            "single"
+          ],
           "allowSeparatedGroups": true
         }
       ]
@@ -147,6 +156,7 @@
     "@stylistic/eslint-plugin": "^1.5.0",
     "@stylistic/eslint-plugin-jsx": "^1.5.0",
     "@stylistic/eslint-plugin-ts": "^1.5.0",
-    "@types/lodash": "^4.14.202"
+    "@types/lodash": "^4.14.202",
+    "eslint-config-react-app": "^7.0.1"
   }
 }
