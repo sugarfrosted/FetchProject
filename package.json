@@ -92,8 +92,7 @@
           "before": false
         }
       ],
-      "@stylistic/no-tabs":
-      [
+      "@stylistic/no-tabs": [
         "warn"
       ],
       "@stylistic/linebreak-style": [
@@ -114,18 +113,27 @@
           "functions": "never"
         }
       ],
-      "no-console": ["error", {
-        "allow": [
-          "warn",
-          "error"
+      "no-console": [
+        "error",
+        {
+          "allow": [
+            "warn",
+            "error"
           ]
         }
       ],
-      "sort-imports": ["warn", {
+      "sort-imports": [
+        "warn",
+        {
           "ignoreCase": false,
           "ignoreDeclarationSort": false,
           "ignoreMemberSort": false,
-          "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
+          "memberSyntaxSortOrder": [
+            "none",
+            "all",
+            "multiple",
+            "single"
+          ],
           "allowSeparatedGroups": true
         }
       ]
