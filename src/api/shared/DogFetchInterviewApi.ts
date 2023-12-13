@@ -1,13 +1,14 @@
+import {
+    Dog,
+    DogsSearchResult,
+    Location,
+    Match,
+} from './DogLookupInterfaces';
 import axios, {
     AxiosInstance,
     AxiosResponse,
     CreateAxiosDefaults,
 } from 'axios';
-import {
-    Dog,
-    DogsSearchResult,
-    Match,
-} from './DogLookupInterfaces';
 
 
 
@@ -143,11 +144,11 @@ export default class DogFetchInverviewApi {
         return response.data || [];
     }
 
-    public async Locations_Search(params: locationsParams) : Promise<mapSearchResults> {
+    public async Post_Locations_Search(params: locationsParams) : Promise<mapSearchResults> {
         const response = await this.axiosInstance.request(
             {
                 method: 'post',
-                url: '/locations',
+                url: '/locations/search',
                 data: params,
             }) as AxiosResponse<mapSearchResults>;
 
@@ -183,7 +184,7 @@ export interface dogParams {
 
 export interface locationsParams {
     city?: string;
-    state?: string;
+    states?: string[];
     geoBoundingBox?: boundingBox;
     size?: number;
     from?: any;

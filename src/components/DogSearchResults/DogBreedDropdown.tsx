@@ -35,7 +35,7 @@ export default function DogBreedDropdown(props: DogBreedDropdownProps) {
 
     return (
     /* eslint-disable indent */
-      <FormControl sx={props.sx}>
+      <FormControl sx={props.sx} fullWidth={props.fullWidth}>
         <InputLabel htmlFor="selSelectBreeds" >Breed</InputLabel>
         <Select
           multiple
@@ -58,5 +58,6 @@ interface DogBreedDropdownProps {
     selectedBreeds: string[];
     menuProps?: Partial<MenuProps> | undefined;
     sx?: SxProps<Theme> | undefined;
+    fullWidth?: boolean;
     handleChange?: ((event: SelectChangeEvent<string[]>, child: ReactNode) => void) | undefined
 }
