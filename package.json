@@ -16,7 +16,6 @@
     "@types/react-dom": "^18.2.15",
     "axios": "^1.6.1",
     "email-validator": "^2.0.4",
-    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -151,7 +150,6 @@
   "devDependencies": {
     "@stylistic/eslint-plugin": "^1.5.0",
     "@stylistic/eslint-plugin-jsx": "^1.5.0",
-    "@stylistic/eslint-plugin-ts": "^1.5.0",
-    "@types/lodash": "^4.14.202"
+    "@stylistic/eslint-plugin-ts": "^1.5.0"
   }
 }
