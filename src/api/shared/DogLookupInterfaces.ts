@@ -27,15 +27,17 @@ export interface Dog {
 
 export interface DogsSearchResult {
     resultIds: string[];
+    /** Number of results based on the search query, capped at 10,000 */
     total: number;
+    /** Query for the next page of results */
     next?: string;
+    /** Query for the previous page of results */
     prev?: string;
 }
 
 export interface Match {
     match: string;
 }
-
 
 export interface DogLookupFilter {
     zipCodes?: string[] | undefined;

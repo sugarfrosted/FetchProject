@@ -17,6 +17,11 @@ import {
     Theme,
 } from "@emotion/react";
 
+/**
+ * Dropdown list of dog breeds
+ * @param props control props, including the list of dog breeds.
+ * @returns A control for selecting dog breeds, using the chip control for display.
+ */
 export default function DogBreedDropdown(props: DogBreedDropdownProps) {
     const dogBreeds = useMemo(() => props.dogBreeds, [props.dogBreeds]);
 

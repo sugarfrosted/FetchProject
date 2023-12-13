@@ -44,128 +44,138 @@ import {
     userLoginState,
 } from "../../state/atoms";
 
-const DogLocationSearch = forwardRef(function DogLocationSearch(props: {zipCodes: string[], onZipChange: (zipCodes: string[]) => void},
-    ref: React.ForwardedRef<{clear: () => void}>) {
-    const [selectedDivisions, setSelectedDivisions] = useState<string[]>([]);
-    const [cityText, setCityText] = useState<string>();
-    const [totalZipCodes, setTotalZipCodes] = useState<number>(0);
-    const [activeCriteria, setActiveCriteria] = useState<{states?: string[], cityText?: string, from: number} | undefined>();
-    const [zipCodes, setZipCodes] = useState<string[]>([]);
-    const getPrevDisabled = useMemo(() => !activeCriteria || totalZipCodes === 0 || activeCriteria.from === 0, [activeCriteria, totalZipCodes]);
-    const getNextDisabled = useMemo(() => !activeCriteria || totalZipCodes === 0 || activeCriteria.from + 25 > totalZipCodes, [activeCriteria, totalZipCodes]);
-    const dogLookupContext = useContext(DogLookupContext);
-    const errorHandlerContext = useContext(ErrorContext);
-    const setLoginState = useSetRecoilState(userLoginState);
+const DogLocationSearch = forwardRef(
+    /**
+     * DogLocationSearchControl
+     * @param props Properties for the location search control
+     * @param ref Reference for handling externally triggered behavior
+     * @returns A control for narrowing down search by geography.
+     */
+    function DogLocationSearch(props: {zipCodes: string[], onZipChange: (zipCodes: string[]) => void},
+        ref: React.ForwardedRef<{clear: () => void}>) {
+        const [selectedDivisions, setSelectedDivisions] = useState<string[]>([]);
+        const [cityText, setCityText] = useState<string>();
+        const [totalZipCodes, setTotalZipCodes] = useState<number>(0);
+        const [activeCriteria, setActiveCriteria] = useState<{states?: string[], cityText?: string, from: number} | undefined>();
+        const [zipCodes, setZipCodes] = useState<string[]>([]);
+        const getPrevDisabled = useMemo(() => !activeCriteria || totalZipCodes === 0 || activeCriteria.from === 0, [activeCriteria, totalZipCodes]);
+        const getNextDisabled = useMemo(() => !activeCriteria || totalZipCodes === 0 || activeCriteria.from + 25 > totalZipCodes, [activeCriteria, totalZipCodes]);
+        const dogLookupContext = useContext(DogLookupContext);
+        const errorHandlerContext = useContext(ErrorContext);
+        const setLoginState = useSetRecoilState(userLoginState);
 
-    const updateActiveCriteria = useCallback(function updateActiveCriteria(cityText: string | undefined, selectedDivisions: string[], from: number) {
-        var updatedCriteria: {states?: string[], cityText?: string, from: number} = {from: from};
-        if (cityText) {
-            updatedCriteria.cityText = cityText;
-        }
-        if (selectedDivisions && selectedDivisions.length !== 0) {
-            updatedCriteria.states = selectedDivisions;
-        }
-        setActiveCriteria(updatedCriteria);
-    }, []);
+        const updateActiveCriteria = useCallback(function updateActiveCriteria(cityText: string | undefined, selectedDivisions: string[], from: number) {
+            var updatedCriteria: {states?: string[], cityText?: string, from: number} = {from: from};
+            if (cityText) {
+                updatedCriteria.cityText = cityText;
+            }
+            if (selectedDivisions && selectedDivisions.length !== 0) {
+                updatedCriteria.states = selectedDivisions;
+            }
+            setActiveCriteria(updatedCriteria);
+        }, []);
 
-    useImperativeHandle(ref, () => {
-        return {
-            clear() {
-                console.log("more butts");
-                clear();
-            },
-        };
-
-    });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => props.onZipChange(zipCodes), [zipCodes]);
-
-    useEffect(() => {
-        if (!activeCriteria) {
-            setTotalZipCodes(0);
-            setZipCodes([]);
-            return;
-        } else {
-            dogLookupContext.GetZipCodesFromLocation(activeCriteria).then(
-                result => {
-                    let zipCodes = result.results.map(x => x.zip_code);
-                    setZipCodes(zipCodes);
-                    setTotalZipCodes(result.total);
+        useImperativeHandle(ref, () => {
+            return {
+                clear() {
+                    clear();
                 },
-                error => {
-                    errorHandlerContext.HandleError(error, () => setLoginState({userName: null, email: null, loginStatus: false}));
-                });
+            };
+
+        });
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        useEffect(() => props.onZipChange(zipCodes), [zipCodes]);
+
+        useEffect(() => {
+            if (!activeCriteria) {
+                setTotalZipCodes(0);
+                setZipCodes([]);
+                return;
+            } else {
+                dogLookupContext.GetZipCodesFromLocation(activeCriteria).then(
+                    result => {
+                        let zipCodes = result.results.map(x => x.zip_code);
+                        setZipCodes(zipCodes);
+                        setTotalZipCodes(result.total);
+                    },
+                    error => {
+                        errorHandlerContext.HandleError(error, () => setLoginState({userName: null, email: null, loginStatus: false}));
+                    });
+            }
+        }, [dogLookupContext, activeCriteria, errorHandlerContext, setLoginState]);
+
+        /**
+         * Clear the control and remove all zipcodes used for filtering
+         * @param _event Event that triggered the clearing action
+         */
+        function clear(_event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+            setZipCodes([]);
+            setCityText(undefined);
+            setSelectedDivisions([]);
+            setActiveCriteria(undefined);
         }
-    }, [dogLookupContext, activeCriteria, errorHandlerContext, setLoginState]);
 
-    function clear(_event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        setZipCodes([]);
-        setCityText(undefined);
-        setSelectedDivisions([]);
-        setActiveCriteria(undefined);
-    }
-
-    function handleDivisionChange(event: SelectChangeEvent<string[]>, _child: ReactNode): void {
-        const { target: { value } } = event;
-        setSelectedDivisions(typeof value === 'string' ? value.split(',') : value);
-    }
+        function handleDivisionChange(event: SelectChangeEvent<string[]>, _child: ReactNode): void {
+            const { target: { value } } = event;
+            setSelectedDivisions(typeof value === 'string' ? value.split(',') : value);
+        }
 
 
-    return (
-    /* eslint-disable indent */
-      <Card>
-        <CardHeader sx={{color: "#1976D2"}} title="Location Criteria" />
-        <CardContent>
-          <Grid container spacing={2} paddingX={2}>
-            <Grid item xs={6}>
-              <DogStateSelect fullWidth handleChange={handleDivisionChange} selectedStates={selectedDivisions}/>
-            </Grid>
-            <Grid item xs={6} >
-              <FormControl fullWidth>
-                <TextField label="City" id="tfCity" content={cityText} onChange={event => setCityText(event.target.value)}/>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <TextField label="ZIP Codes for search" id="tfZipCodes" disabled multiline value={(zipCodes || []).join(", ")} />
-              </FormControl></Grid>
-          </Grid>
-          <CardActionArea>
-            <Stack direction="row" sx={{marginX: 2, marginTop: 2}}>
-              <Button disabled={getPrevDisabled}
-                onClick={_event => {
-                  if (!activeCriteria) {return;}
-                  let currentActiveCriteria = {
-                    states: activeCriteria.states,
-                    from: activeCriteria.from - 25,
-                    cityText: activeCriteria.cityText,
-                  };
-                  setActiveCriteria(currentActiveCriteria);
-                }}>
-                Get previous 25
-              </Button>
-              <Button onClick={() => updateActiveCriteria(cityText, selectedDivisions, 0)}>Update</Button>
-              <Button disabled={getNextDisabled}
-                onClick={_event => {
-                  if (!activeCriteria) {return;}
-                  let currentActiveCriteria = {
-                    states: activeCriteria.states,
-                    from: activeCriteria.from + 25,
-                    cityText: activeCriteria.cityText,
-                  };
-                  setActiveCriteria(currentActiveCriteria);
-                }}>
-                Get next 25
-              </Button>
-              <Button onClick={clear}>Clear Query</Button>
-            </Stack>
-          </CardActionArea>
-        </CardContent>
-      </Card>
-    /* eslint-enable indent */
-    );
-});
+        return (
+        /* eslint-disable indent */
+          <Card>
+            <CardHeader sx={{color: "#1976D2"}} title="Location Criteria" />
+            <CardContent>
+              <Grid container spacing={2} paddingX={2}>
+                <Grid item xs={6}>
+                  <DogStateSelect fullWidth handleChange={handleDivisionChange} selectedStates={selectedDivisions}/>
+                </Grid>
+                <Grid item xs={6} >
+                  <FormControl fullWidth>
+                    <TextField label="City" id="tfCity" content={cityText} onChange={event => setCityText(event.target.value)}/>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <TextField label="ZIP Codes for search" id="tfZipCodes" disabled multiline value={(zipCodes || []).join(", ")} />
+                  </FormControl></Grid>
+              </Grid>
+              <CardActionArea>
+                <Stack direction="row" sx={{marginX: 2, marginTop: 2}}>
+                  <Button disabled={getPrevDisabled}
+                    onClick={_event => {
+                      if (!activeCriteria) {return;}
+                      let currentActiveCriteria = {
+                        states: activeCriteria.states,
+                        from: activeCriteria.from - 25,
+                        cityText: activeCriteria.cityText,
+                      };
+                      setActiveCriteria(currentActiveCriteria);
+                    }}>
+                    Get previous 25
+                  </Button>
+                  <Button onClick={() => updateActiveCriteria(cityText, selectedDivisions, 0)}>Update</Button>
+                  <Button disabled={getNextDisabled}
+                    onClick={_event => {
+                      if (!activeCriteria) {return;}
+                      let currentActiveCriteria = {
+                        states: activeCriteria.states,
+                        from: activeCriteria.from + 25,
+                        cityText: activeCriteria.cityText,
+                      };
+                      setActiveCriteria(currentActiveCriteria);
+                    }}>
+                    Get next 25
+                  </Button>
+                  <Button onClick={clear}>Clear Query</Button>
+                </Stack>
+              </CardActionArea>
+            </CardContent>
+          </Card>
+        /* eslint-enable indent */
+        );
+    });
 
 export default DogLocationSearch;
 

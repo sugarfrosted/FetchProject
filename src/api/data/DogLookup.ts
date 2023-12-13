@@ -4,7 +4,7 @@ import {
     DogsSearchResult,
 } from "../shared/DogLookupInterfaces";
 import DogFetchInterviewApi, {
-    dogParams, locationsParams, mapSearchResults,
+    dogParams, locationsParams, mapSearchResults, sortCombos,
 } from "../shared/DogFetchInterviewApi";
 import {
     GridSortModel,
@@ -126,12 +126,12 @@ export default class DogLookup {
 
     }
 
-    private static getDogSort(sort: GridSortModel | undefined): string {
+    private static getDogSort(sort: GridSortModel | undefined): sortCombos {
         var activeSort = (sort || []).find(sortItems => ["name", "age", "breed"].findIndex(key => key === sortItems.field) !== -1);
         var field = activeSort?.field as keyof Dog || "breed";
         var order = activeSort?.sort || 'asc';
 
-        return [field, order].join(":");
+        return [field, order].join(":") as sortCombos;
     }
 }
 

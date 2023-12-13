@@ -179,8 +179,11 @@ export interface dogParams {
     ageMax?: number | undefined;
     size?: number;
     from?: number;
-    sort?: string;
+    sort?: sortCombos;
 }
+
+/**The resulting supported sort keys by the api */
+export type sortCombos = 'name:asc' | 'name:desc' | 'age:asc' | 'age:desc' | 'breed:asc' | 'breed:desc';
 
 export interface locationsParams {
     city?: string;

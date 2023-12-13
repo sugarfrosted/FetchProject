@@ -44,6 +44,7 @@ import {
     userLoginState,
 } from '../../state/atoms';
 
+/**Data grid that shows the dog search results */
 export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps) {
     const columns: GridColDef[] = [
         { field: 'name', headerName: 'Name', sortable: true, hideable: false, filterable: false, disableColumnMenu: true, flex: 1 },
