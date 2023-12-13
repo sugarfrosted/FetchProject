@@ -30,13 +30,11 @@ export default class Comparitors {
             return false;
         }
 
-        if (first.breeds?.join('\x1f') !== second.breeds?.join('\x1f')
-            && first.breeds?.toSorted().join('\x1f') !== second.breeds?.toSorted().join('\x1f')) {
+        if (first.breeds?.sort().join('\x1f') !== second.breeds?.sort().join('\x1f')) {
             return false;
         }
 
-        if (first.zipCodes?.join('\x1f') !== second.zipCodes?.join('\x1f')
-            && first.zipCodes?.toSorted().join('\x1f') !== second.zipCodes?.toSorted().join('\x1f')) {
+        if (first.zipCodes?.sort().join('\x1f') !== second.zipCodes?.sort().join('\x1f')) {
             return false;
         }
 
