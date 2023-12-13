@@ -79,37 +79,6 @@ export default function DogSearch(_props: dogSearchProps) {
         });
     }
 
-    return (
-    /* eslint-disable indent */
-      <div>
-        <DogSearchCriteria
-          updateFilterCallback={(filterModel: DogLookupFilter, isClearing: boolean = false) => {
-            setActiveFilter(filterModel);
-            if (isClearing) {
-              setRowSelectionModel([]);
-            }
-          }}
-          activeSearchCriteria={activeFilter}
-          findMatchClickHandler={findMatch}
-          matchDisabled={!rowSelectionModel || rowSelectionModel.length === 0}
-        />
-        <DogSearchResultsDataGrid
-          onPaginationModelChange={onPaginationModelChange}
-          onSortModelChange={onSortModelChange}
-          onFilterModelChange={onFilterModelChanged}
-          onRowSelectionModelChange={onRowSelectionModelChange}
-          rows={rows}
-          rowCount={rowCount}
-          filterModel={activeFilter}
-          selection={rowSelectionModel} />
-        <DogMatchDisplay
-          match={dogMatch}
-          open={showMatchPopup}
-          onClose={onCloseDogMatchPopup} />
-      </div>
-    /* eslint-enable indent */
-    );
-
     async function onSortModelChange(model: GridSortModel, _details: GridCallbackDetails<any>, paginationModel: GridPaginationModel): Promise<void> {
         await LoadDogs(model, paginationModel, activeFilter);
     }
@@ -175,7 +144,6 @@ export default function DogSearch(_props: dogSearchProps) {
     }
 
     function onCloseDogMatchPopup(_event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-        console.log(_event);
         var temp = 'btnCloseNoMatchFound' as DogMatchButtonIds;
         switch (temp) {
         case 'btnCloseNoMatchFound':
@@ -187,6 +155,39 @@ export default function DogSearch(_props: dogSearchProps) {
             throw new Error(`Button type: ${temp} not supported`);
         }
     }
+
+    return (
+    /* eslint-disable indent */
+      <div>
+        <DogSearchCriteria
+          updateFilterCallback={(filterModel: DogLookupFilter, isClearing: boolean = false) => {
+            setActiveFilter(filterModel);
+            if (isClearing) {
+              setRowSelectionModel([]);
+            }
+          }}
+          activeSearchCriteria={activeFilter}
+          findMatchClickHandler={findMatch}
+          matchDisabled={!rowSelectionModel || rowSelectionModel.length === 0}
+        />
+        <DogSearchResultsDataGrid
+          onPaginationModelChange={onPaginationModelChange}
+          onSortModelChange={onSortModelChange}
+          onFilterModelChange={onFilterModelChanged}
+          onRowSelectionModelChange={onRowSelectionModelChange}
+          rows={rows}
+          rowCount={rowCount}
+          filterModel={activeFilter}
+          selection={rowSelectionModel} />
+        <DogMatchDisplay
+          match={dogMatch}
+          open={showMatchPopup}
+          onClose={onCloseDogMatchPopup}
+          sx={{maxHeight: "50em", flexGrow: 1}} />
+      </div>
+    /* eslint-enable indent */
+    );
+
 }
 
 interface dogSearchProps {

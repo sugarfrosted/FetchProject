@@ -1,11 +1,11 @@
-import DogFetchInterviewApi, {
-    dogParams,
-} from "../shared/DogFetchInterviewApi";
 import {
     Dog,
     DogLookupParams,
     DogsSearchResult,
 } from "../shared/DogLookupInterfaces";
+import DogFetchInterviewApi, {
+    dogParams, locationsParams, mapSearchResults,
+} from "../shared/DogFetchInterviewApi";
 import {
     GridSortModel,
 } from "@mui/x-data-grid";
@@ -64,6 +64,22 @@ export default class DogLookup {
         }
         var matchDog = await this._api.Post_Dogs(matchResult.match).then(result => result[0]);
         return matchDog;
+    }
+
+    public async GetZipCodesFromLocation(params: {states?: string[] | undefined, city?: string | undefined, from?: number}, size?: number ): Promise<mapSearchResults> {
+        var queryParams = {} as locationsParams;
+        if (params.states && params.states.length !== 0) {
+            queryParams.states = params.states;
+        }
+        if (params.city) {
+            queryParams.city = params.city;
+        }
+        if (params.from) {
+            queryParams.from = params.from;
+        }
+        queryParams.size = size || 25;
+
+        return this._api.Post_Locations_Search(queryParams);
     }
 
 
