@@ -4,6 +4,9 @@ import {
     Slider,
     SxProps,
 } from '@mui/material';
+import {
+    Mark,
+} from '@mui/base/useSlider';
 import Settings from "../../Configuration.json";
 import {
     Theme,
@@ -18,26 +21,23 @@ export default function DogAgeSlider(props: DogAgeRangeSelectorProps) {
         return maxAge < 10 ? 10 : maxAge;
     }, []);
     const marks = useMemo(() => {
-        var result: {value: number, label?: string}[] = [];
-        result.push({value: 0, label: '<1 year'});
+        var result: Mark[] = [];
+        result.push({value: 0, label: <span style={{marginLeft: "49%"}}>&lt;1 year</span>});
         for (let count = 5; count < max_age; count += 5) {
             result.push({value: count});
         }
-        result.push({value: max_age, label: `${max_age} years (no max)`});
-
+        result.push({value: max_age, label: <span style={{marginLeft: "-49%"}} >{`${max_age} years (no max)`}</span>});
 
         // find lowest middle 5 and label it
         const lowMidIdx = Math.floor((result.length - 1) / 2);
-        result[lowMidIdx].label = `${result[lowMidIdx].value} years`;
-
-        console.log(result);
+        result[lowMidIdx].label = <span>{`${result[lowMidIdx].value} years`}</span>;
 
         return result;
     }, [max_age]);
 
     return (
     /* eslint-disable indent */
-      <FormControl sx={props.sx}>
+      <FormControl fullWidth={props.fullWidth} sx={props.sx}>
         <FormLabel id="lblSelectAge">Age Selection</FormLabel>
         <Slider
           aria-labelledby="lblSelectAge"
@@ -56,5 +56,6 @@ export default function DogAgeSlider(props: DogAgeRangeSelectorProps) {
 interface DogAgeRangeSelectorProps {
     handleChange: (event: Event, value: number[] | number, activeThumb: number) => void;
     value: number[];
+    fullWidth?: boolean;
     sx?: SxProps<Theme> | undefined;
 }

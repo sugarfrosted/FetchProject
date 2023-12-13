@@ -1,8 +1,10 @@
 import {
     Accordion,
+    AccordionActions,
     AccordionDetails,
     AccordionSummary,
     Button,
+    Grid,
     SelectChangeEvent,
     Stack,
     Typography,
@@ -11,10 +13,12 @@ import {
     useContext,
     useEffect,
     useMemo,
+    useRef,
     useState,
 } from "react";
 import DogAgeRangeSelector from "./DogAgeRangeSelector";
 import DogBreedDropdown from "./DogBreedDropdown";
+import DogLocationSearch from "./DogLocationSearch";
 import {
     DogLookupContext,
 } from "../../state/DogContext";
@@ -36,6 +40,7 @@ const MenuProps = {
 };
 
 export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) {
+    const locationSearchRef = useRef<{clear: () => void}>(null);
     const dogLookup = useContext(DogLookupContext);
     const updateFilterCallback = props.updateFilterCallback;
     const matchDisabled = useMemo(() => !!props.matchDisabled, [props.matchDisabled]);
@@ -47,10 +52,15 @@ export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) 
     const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
     const [selectedAgeRange, setSelectedAgeRange] = useState<number[]>([0, max_age]);
     const [isClearing, setIsClearing] = useState(false);
+    const [zipCodes, setZipCodes] = useState<string[]>([]);
 
-    function clearFilter() {
+    async function clearFilter() {
         setSelectedBreeds([]);
         setSelectedAgeRange([0, max_age]);
+        setZipCodes([]);
+        if (locationSearchRef.current) {
+            locationSearchRef.current.clear();
+        }
         setIsClearing(true);
     }
 
@@ -65,9 +75,12 @@ export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) 
             let ageMax = Math.max(selectedAgeRange[0], selectedAgeRange[1]);
             if (ageMax <= max_age) {filter.ageMax = ageMax;}
         }
+        if (zipCodes && zipCodes.length !== 0) {
+            filter.zipCodes = zipCodes;
+        }
         return filter;
 
-    }, [selectedBreeds, selectedAgeRange, max_age]);
+    }, [selectedBreeds, selectedAgeRange, max_age, zipCodes]);
 
     useEffect(() => {
         if (isClearing) {
@@ -112,19 +125,26 @@ export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) 
           <Typography>Filter Settings</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <div style={{display: "flex"}}>
-            <div style={{flex: 1, paddingLeft: '1em', paddingRight: '1em'}}>
-              <DogBreedDropdown sx={{ m: 1, width: "100%", mt: 3 }}
+          <Grid container spacing={2} paddingX={2}>
+            <Grid item xs={6} >
+              <DogBreedDropdown
+                sx={{ m: 1, mt: 3 }}
+                fullWidth
                 dogBreeds={dogBreeds}
                 selectedBreeds={selectedBreeds}
                 handleChange={handleDogBreedDropdownChange}
                 menuProps={MenuProps}
               />
-            </div>
-            <div style={{flex: 1, paddingLeft: '2em', paddingRight: '4em'}}>
-              <DogAgeRangeSelector sx={{ m: 1, width: "100%", mt: 3}} handleChange={handleDogAgeChange} value={selectedAgeRange} />
-            </div>
-          </div>
+            </Grid>
+            <Grid item xs={6} >
+              <DogAgeRangeSelector sx={{ m: 1, mt: 3}} fullWidth handleChange={handleDogAgeChange} value={selectedAgeRange} />
+            </Grid>
+            <Grid item xs={6} >
+              <DogLocationSearch ref={locationSearchRef} zipCodes={zipCodes} onZipChange={(zipCodes: string[]) => setZipCodes(zipCodes)} />
+            </Grid>
+          </Grid>
+        </AccordionDetails>
+        <AccordionActions>
           <Stack direction={"row"}>
             <Button onClick={() => props.updateFilterCallback(currentFilterState)}>{hasFilterChanges ? "Update Filter" : "Rerun Search"}</Button>
             <Button onClick={clearFilter}>Clear Search</Button>
@@ -132,7 +152,7 @@ export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) 
               <Button onClick={props.findMatchClickHandler} disabled={matchDisabled}>Find Match</Button>)
             }
           </Stack>
-        </AccordionDetails>
+        </AccordionActions>
       </Accordion>
     /* eslint-disable indent */
     );

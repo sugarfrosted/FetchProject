@@ -1,6 +1,7 @@
 {
     "CA" : {
         "name": "Canada",
+        "abbr": "CA",
         "divisions": [
             {
                 "name": "Alberta",
@@ -58,6 +59,7 @@
     },
     "US" : {
         "name": "United States",
+        "abbr": "US",
         "divisions": [
             {
                 "name": "Alabama",
