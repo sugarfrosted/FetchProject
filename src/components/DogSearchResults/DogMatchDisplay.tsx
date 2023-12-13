@@ -41,6 +41,7 @@ const Transition = forwardRef(function Transition(
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
+/**Pop up to show dog match result or error. */
 export default function DogMatchDisplay(props: DogMatchDisplayProps) {
     return (
     /* eslint-disable indent */
@@ -57,6 +58,7 @@ export default function DogMatchDisplay(props: DogMatchDisplayProps) {
     );
 }
 
+/**Control to show dog the match service matched someone with */
 export function DogMatchPopup(props: DogMatchDisplayProps) {
 
     const displayAge = useMemo(() => PrettifyAge(props.match?.age), [props]);
@@ -92,6 +94,7 @@ export function DogMatchPopup(props: DogMatchDisplayProps) {
     );
 }
 
+/**Control to show when no matched dog was found. The API likely prevents this case from happening. */
 export function NoMatchFound(props: PopupProps){
     return (
     /* eslint-disable indent */

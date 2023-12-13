@@ -16,12 +16,13 @@ import {
 } from "react";
 import {
     AuthContext,
-} from "../state/DogContext";
+} from "../../state/DogContext";
 import {
     validate as isValidEmail,
 } from "email-validator";
 
 
+/** Dialog for logging into the application. */
 export default function LoginPane(params: loginPaneParams) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");

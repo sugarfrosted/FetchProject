@@ -7,9 +7,8 @@ import {
 } from "@mui/material";
 
 
-
-export function LabelValueBox(props: NewType) {
-
+/**Label and value pairs for showing the details about the matched dog in the results page. */
+export function LabelValueBox(props: LabelValueProps) {
     var label = typeof props.label === 'string' ? props.label + ":" : props.label;
     var labelReading = typeof props.label === 'string' ? props.label : undefined;
     var flex = typeof props.flex === 'undefined' ? 1 : props.flex ?? undefined;
@@ -39,7 +38,7 @@ export function LabelValueBox(props: NewType) {
     );
 }
 
-interface NewType {
+interface LabelValueProps {
     labelId: string;
     label: string | ReactNode;
     value: string | ReactNode;

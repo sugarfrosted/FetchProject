@@ -14,8 +14,8 @@ import DogSearch from './DogSearch';
 import {
     ErrorContext,
 } from '../state/DogContext';
-import LoginPane from './LoginPane';
-import TopBar from './TopBar';
+import LoginPane from './Authentication/LoginPane';
+import TopBar from './Authentication/TopBar';
 import {
     useRecoilState,
 } from 'recoil';
@@ -23,6 +23,14 @@ import {
     userLoginState,
 } from '../state/atoms';
 
+/** The dog search activity. This shows both the placeholder and actual functional website.
+ *  This exists in order to give the whole application to context and recoil atoms.
+ *  This assumes that a containing layer has the following contexts defined:
+ * - DogLookupContext
+ * - Authentication
+ * - ErrorHandler
+ * - RecoilRoot
+ */
 function DogSearchActivity() {
     const [loginPaneOpen, setLoginPaneOpen] = useState(false);
     const [loginState, setLoginState] = useRecoilState(userLoginState);

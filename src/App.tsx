@@ -25,15 +25,15 @@ function App() {
 
     return (
     /* eslint-disable indent */
-      <ErrorContext.Provider value={errorLookup}>
-        <DogLookupContext.Provider value={dogLookup}>
-          <AuthContext.Provider value={authLookup}>
-            <RecoilRoot>
+      <RecoilRoot>
+        <ErrorContext.Provider value={errorLookup}>
+          <DogLookupContext.Provider value={dogLookup}>
+            <AuthContext.Provider value={authLookup}>
               <DogSearchActivity/>
-            </RecoilRoot>
-          </AuthContext.Provider>
-        </DogLookupContext.Provider>
-      </ErrorContext.Provider>
+            </AuthContext.Provider>
+          </DogLookupContext.Provider>
+        </ErrorContext.Provider>
+      </RecoilRoot>
     /* eslint-enable indent */
     );
 }

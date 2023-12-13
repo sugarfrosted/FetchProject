@@ -18,15 +18,16 @@ import {
 } from "react";
 import {
     AuthContext,
-} from "../state/DogContext";
-import Authentication from "../api/auth/Authentication";
+} from "../../state/DogContext";
+import Authentication from "../../api/auth/Authentication";
 import {
     useRecoilValue,
 } from "recoil";
 import {
     userLoginState,
-} from "../state/atoms";
+} from "../../state/atoms";
 
+/**Top bar for the application. Shows login status as well as the controls for logging in and logging out. */
 export default function TopBar(props: TopBarProps) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
