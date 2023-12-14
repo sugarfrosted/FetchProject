@@ -61,7 +61,7 @@ export default function TopBar(props: TopBarProps) {
       <AppBar position="sticky" sx={{marginBottom: "2em"}}>
         <Toolbar>
           <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>
-            Dog Searcher!
+            Dog Finder!
           </Typography>
           {
           isLoggedIn ?
