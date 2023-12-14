@@ -47,12 +47,13 @@ import {
 /**Data grid that shows the dog search results */
 export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGridProps) {
     const columns: GridColDef[] = [
-        { field: 'name', headerName: 'Name', sortable: true, hideable: false, filterable: false, disableColumnMenu: true, flex: 1 },
-        { field: 'img', headerName: 'Image', sortable: false, hideable: false, filterable: false, disableColumnMenu: true, renderCell: data => getDogImageAnchor(data) },
-        { field: 'age', headerName: 'Age', sortable: true, hideable: false, filterable: false, disableColumnMenu: true,
-            valueFormatter: (params: GridValueFormatterParams<number>) => PrettifyAge(params.value)},
+        { field: 'name', headerName: 'Name', sortable: true, hideable: false, filterable: false, disableColumnMenu: true, flex: 2 },
+        { field: 'img', headerName: 'Image', sortable: false, hideable: false, filterable: false, disableColumnMenu: true,
+            renderCell: data => getDogImageAnchor(data) },
+        { field: 'age', headerName: 'Age', sortable: true, hideable: false, filterable: false, disableColumnMenu: true, flex: 1,
+            valueFormatter: (params: GridValueFormatterParams<number>) => PrettifyAge(params.value) },
         { field: 'zip_code', headerName: 'ZIP Code', sortable: false, hideable: false, filterable: false, disableColumnMenu: true },
-        { field: 'breed', headerName: 'Breed', sortable: true, hideable: false, filterable: false, disableColumnMenu: true, flex: 1 },
+        { field: 'breed', headerName: 'Breed', sortable: true, hideable: false, filterable: false, disableColumnMenu: true, flex: 2 },
     ];
 
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
