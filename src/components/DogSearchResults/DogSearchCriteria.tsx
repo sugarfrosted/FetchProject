@@ -16,7 +16,6 @@ import {
     useRef,
     useState,
 } from "react";
-import Comparitors from "../../utils/Comparitors";
 import DogAgeRangeSelector from "./DogAgeRangeSelector";
 import DogBreedDropdown from "./DogBreedDropdown";
 import DogLocationSearch from "./DogLocationSearch";
@@ -30,6 +29,7 @@ import {
     GridExpandMoreIcon,
 } from "@mui/x-data-grid";
 import Settings from "../../Configuration.json";
+import _ from 'lodash';
 
 const MenuProps = {
     PaperProps: {
@@ -100,7 +100,7 @@ export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) 
     }, [dogLookup, dogLookup?.IsLoggedin]);
 
     const hasFilterChanges = useMemo(
-        () => !Comparitors.AreDogLookupFiltersEqual(props.activeSearchCriteria, currentFilterState),
+        () => !_.isEqual(props.activeSearchCriteria, currentFilterState),
         [currentFilterState, props.activeSearchCriteria]);
 
     const handleDogBreedDropdownChange = (event: SelectChangeEvent<typeof selectedBreeds>) => {
