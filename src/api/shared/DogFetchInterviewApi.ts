@@ -9,10 +9,9 @@ import axios, {
     AxiosResponse,
     CreateAxiosDefaults,
 } from 'axios';
+import { IDogFetchInterviewApi, } from './IDogFetchInterviewApi';
 
-
-
-export default class DogFetchInverviewApi {
+export default class DogFetchInverviewApi implements IDogFetchInterviewApi {
 
     IsLoggedIn: boolean = false;
 
@@ -155,14 +154,13 @@ export default class DogFetchInverviewApi {
         return response.data;
     }
 
-    public async Run_Get_Query(request: string) {
-        if (!request.match(/^\/dogs\/search\?/i)) {
-            return Promise.reject("Unsupported call.");
+    public async Run_Get_Query(request: string ) : Promise<DogsSearchResult> {
+        if (request.match(/^\/dogs\/search\?/i)) {
+            var response = await this.axiosInstance.get(request);
+            return response.data as Promise<DogsSearchResult>;
         }
 
-        var response = await this.axiosInstance.get(request);
-
-        return response.data;
+        return Promise.reject("Unsupported call.");
     }
 }
 
