@@ -2,10 +2,10 @@ import {
     Dog,
     DogsSearchResult,
     Location,
-    Match
+    Match,
 } from './DogLookupInterfaces';
-import { dogParams, locationsParams, mapSearchResults } from './DogFetchInterviewApi';
-import { IDogFetchInterviewApi } from './IDogFetchInterviewApi';
+import { dogParams, locationsParams, mapSearchResults, } from './DogFetchInterviewApi';
+import { IDogFetchInterviewApi, } from './IDogFetchInterviewApi';
 
 
 export class DogFetchInverviewApiMock implements IDogFetchInterviewApi {
@@ -57,24 +57,29 @@ export class DogFetchInverviewApiMock implements IDogFetchInterviewApi {
         if (this.IsInErrorMode) {
             return Promise.reject(401);
         }
-        return Promise.resolve(["Afghan", "Beagle", "Chihuahua"]);
+        return Promise.resolve(["Afghan", "Beagle", "Chihuahua", "Dachshund", "English Setter"]);
     }
 
     Get_Dogs_Search(params: dogParams): Promise<DogsSearchResult> {
         throw new Error('Method not implemented.');
     }
+
     Post_Dogs(dogsIds: string | string[]): Promise<Dog[]> {
         throw new Error('Method not implemented.');
     }
+
     Post_Dogs_Match(dogsIds: string[]): Promise<Match> {
         throw new Error('Method not implemented.');
     }
+
     Post_Locations(zipCodes: string[]): Promise<Location[]> {
         throw new Error('Method not implemented.');
     }
+
     Post_Locations_Search(params: locationsParams): Promise<mapSearchResults> {
         throw new Error('Method not implemented.');
     }
+
     Run_Get_Query(request: string): Promise<DogsSearchResult> {
         throw new Error('Method not implemented.');
     }
