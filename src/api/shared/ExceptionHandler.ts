@@ -1,13 +1,13 @@
 import {
     AxiosError,
 } from "axios";
-import DogFetchInverviewApi from "./DogFetchInterviewApi";
+import IDogFetchInverviewApi from "./IDogFetchInterviewApi";
 
 export default class ExceptionHandler {
 
-    private _api: DogFetchInverviewApi;
+    private _api: IDogFetchInverviewApi;
 
-    constructor(api: DogFetchInverviewApi) {
+    constructor(api: IDogFetchInverviewApi) {
         this._api = api;
     }
 

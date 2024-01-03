@@ -4,12 +4,12 @@ import {
     Location,
     Match,
 } from './DogLookupInterfaces';
+import IDogFetchInterviewApi, { dogParams, locationsParams, mapSearchResults, } from './IDogFetchInterviewApi';
 import axios, {
     AxiosInstance,
     AxiosResponse,
     CreateAxiosDefaults,
 } from 'axios';
-import { IDogFetchInterviewApi, } from './IDogFetchInterviewApi';
 
 export default class DogFetchInverviewApi implements IDogFetchInterviewApi {
 
@@ -163,49 +163,3 @@ export default class DogFetchInverviewApi implements IDogFetchInterviewApi {
         return Promise.reject("Unsupported call.");
     }
 }
-
-export interface mapSearchResults {
-    results: Location[];
-    total: number;
-}
-
-
-export interface dogParams {
-    breeds?: string[];
-    zipCodes?: string[];
-    ageMin?: number | undefined;
-    ageMax?: number | undefined;
-    size?: number;
-    from?: number;
-    sort?: sortCombos;
-}
-
-/**The resulting supported sort keys by the api */
-export type sortCombos = 'name:asc' | 'name:desc' | 'age:asc' | 'age:desc' | 'breed:asc' | 'breed:desc';
-
-export interface locationsParams {
-    city?: string;
-    states?: string[];
-    geoBoundingBox?: boundingBox;
-    size?: number;
-    from?: any;
-}
-
-interface AllCorners {
-    top: Location,
-    bottom: Location,
-    left: Location,
-    right: Location,
-}
-
-interface BottomLeftToTopRight {
-    bottom_left: Location,
-    top_right: Location,
-}
-
-interface BottomRightToTopLeft {
-    bottom_right: Location,
-    top_left: Location,
-}
-
-export type boundingBox = BottomLeftToTopRight | BottomRightToTopLeft | AllCorners;

@@ -3,15 +3,16 @@ import {
     DogLookupParams,
     DogsSearchResult,
 } from "../shared/DogLookupInterfaces";
-import DogFetchInterviewApi, {
+import {
     dogParams, locationsParams, mapSearchResults, sortCombos,
-} from "../shared/DogFetchInterviewApi";
+} from "../shared/IDogFetchInterviewApi";
 import {
     GridSortModel,
 } from "@mui/x-data-grid";
+import IDogFetchInterviewApi from "../shared/IDogFetchInterviewApi";
 
 export default class DogLookup {
-    private _api : DogFetchInterviewApi;
+    private _api : IDogFetchInterviewApi;
 
     private _dogBreeds : string[] = [];
 
@@ -26,7 +27,7 @@ export default class DogLookup {
         return this._api.IsLoggedIn;
     }
 
-    constructor(api: DogFetchInterviewApi) {
+    constructor(api: IDogFetchInterviewApi) {
         this._api = api;
     }
 

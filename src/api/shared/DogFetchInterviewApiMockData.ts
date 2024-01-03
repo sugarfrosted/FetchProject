@@ -1,10 +1,10 @@
 import { Dog, DogsSearchResult, } from './DogLookupInterfaces';
 import Data from './DogFetchInterviewApiMockDogData.json';
-import { dogParams, } from './DogFetchInterviewApi';
+import { dogParams, } from './IDogFetchInterviewApi';
 
 type dogSortKey = (keyof Dog & ('name' | 'age' | 'breed'));
 
-export class DogFetchInverviewApiMockData {
+export default class DogFetchInterviewApiMockData {
     constructor() {
         this.dogData = Data.dogs.map(value => {
             return {age: value.age, breed: value.breed, zip_code: value.zip, name: value.name, img: value.img, id: value.id } as Dog;
@@ -56,7 +56,7 @@ export class DogFetchInverviewApiMockData {
         var rangeStart = params.from || 0;
         var rangeEnd = rangeStart + (params.size || 25);
 
-        var totalResults = this.dogData.filter(DogFetchInverviewApiMockData.GetFilterFunction(params))
+        var totalResults = this.dogData.filter(DogFetchInterviewApiMockData.GetFilterFunction(params))
             .map(value => value.id);
 
         return { total: totalResults.length, resultIds: totalResults.filter((_id, index) => (rangeStart <= index && index < rangeEnd)) };
@@ -86,37 +86,37 @@ export class DogFetchInverviewApiMockData {
         var zips: string[] = [];
 
         if (containsStates(["NL", "PE", "NS", "NB", "QC", "ON", "MB", "SK", "AB", "BC", "YT", "NT", "NU"])) {
-            zips = zips.concat(["00111"]);
+            zips.push("00111");
         }
         if (containsStates(["CT", "MA", "ME", "NH", "NJ", "NY", "PR", "RI", "VT", "VI"])) {
-            zips = zips.concat(["06256"]);
+            zips.push("06256");
         }
         if (containsStates(["DE", "NY", "PA"])) {
-            zips = zips.concat(["10002"]);
+            zips.push("10002");
         }
         if (containsStates(["DC", "MD", "NC", "SC", "VA", "WV"])) {
-            zips = zips.concat(["20345"]);
+            zips.push("20345");
         }
         if (containsStates(["AL", "FL", "GA", "MS", "TN"])) {
-            zips = zips.concat(["30456"]);
+            zips.push("30456");
         }
         if (containsStates(["IN", "KY", "MI", "OH"])) {
-            zips = zips.concat(["45675"]);
+            zips.push("45675");
         }
         if (containsStates(["IA", "MN", "MT", "ND", "SD", "WI"])) {
-            zips = zips.concat(["53713"]);
+            zips.push("53713");
         }
         if (containsStates(["IL", "KS", "MO", "NE"])) {
-            zips = zips.concat(["67854"]);
+            zips.push("67854");
         }
         if (containsStates(["AR", "LA", "OK", "TX"])) {
-            zips = zips.concat(["78594"]);
+            zips.push("78594");
         }
         if (containsStates(["AZ", "CO", "ID", "NM", "NV", "UT", "WY"])) {
-            zips = zips.concat(["84857"]);
+            zips.push("84857");
         }
         if (containsStates(["AK", "AS", "CA", "GU", "HI", "MH", "FM", "MP", "OR", "PW", "WA"])) {
-            zips = zips.concat(["95667"]);
+            zips.push("95667");
         }
 
 

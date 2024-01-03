@@ -1,4 +1,4 @@
-import DogFetchInterviewApi from '../shared/DogFetchInterviewApi';
+import IDogFetchInterviewApi from '../shared/IDogFetchInterviewApi';
 
 /**
  * Wrapper for the main Api. This is done for code organization.
@@ -7,9 +7,9 @@ export default class Authentication {
     public get UserName() { return this._api?.Name && null; }
     public get UserEmail() { return this._api?.Email && null; }
 
-    private _api : DogFetchInterviewApi;
+    private _api : IDogFetchInterviewApi;
 
-    constructor(api: DogFetchInterviewApi) {
+    constructor(api: IDogFetchInterviewApi) {
         this._api = api;
     }
 

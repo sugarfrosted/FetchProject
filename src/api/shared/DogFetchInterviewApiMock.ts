@@ -4,16 +4,16 @@ import {
     Location,
     Match,
 } from './DogLookupInterfaces';
-import { dogParams, locationsParams, mapSearchResults, } from './DogFetchInterviewApi';
-import { IDogFetchInterviewApi, } from './IDogFetchInterviewApi';
+import IDogFetchInterviewApi, { dogParams, locationsParams, mapSearchResults, } from './IDogFetchInterviewApi';
+import DogFetchInterviewApiMockData from './DogFetchInterviewApiMockData';
 
 
-export class DogFetchInverviewApiMock implements IDogFetchInterviewApi {
+export class DogFetchInterviewApiMock implements IDogFetchInterviewApi {
 
-    IsLoggedIn = false;
+    public IsLoggedIn = false;
     public IsInErrorMode?: boolean;
 
-    constructor(isInErrorMode: boolean) {
+    constructor(isInErrorMode?: boolean) {
         this.IsInErrorMode = !!isInErrorMode;
     }
 
@@ -65,7 +65,19 @@ export class DogFetchInverviewApiMock implements IDogFetchInterviewApi {
     }
 
     Post_Dogs(dogsIds: string | string[]): Promise<Dog[]> {
-        throw new Error('Method not implemented.');
+        if (this.IsInErrorMode) {
+            return Promise.reject(401);
+        }
+
+        var dogs: Dog[] = [];
+        if (typeof dogsIds === 'string') {
+            dogsIds = [dogsIds];
+        }
+        for (let id of dogsIds) {
+            dogs.push(DogFetchInterviewApiMockData.getDataFromId(id));
+        }
+
+        return Promise.resolve(dogs);
     }
 
     Post_Dogs_Match(dogsIds: string[]): Promise<Match> {
