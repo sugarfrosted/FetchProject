@@ -1,5 +1,5 @@
-import { Dog, DogsSearchResult, Location, } from './DogLookupInterfaces';
-import { dogParams, locationsParams, mapSearchResults, } from './IDogFetchInterviewApi';
+import { Dog, DogsSearchResult, Location, } from '../shared/DogLookupInterfaces';
+import { dogParams, locationsParams, mapSearchResults, } from '../shared/IDogFetchInterviewApi';
 import Data from './DogFetchInterviewApiMockDogData.json';
 
 type dogSortKey = (keyof Dog & ('name' | 'age' | 'breed'));
@@ -14,7 +14,7 @@ export default class DogFetchInterviewApiMockData {
 
     private dogData: Dog[];
 
-    private static GetFilterFunction(params: dogParams) {
+    protected static GetFilterFunction(params: dogParams) {
         return (dog: Dog, index: number) => {
 
             if (params.ageMin != null && dog.age < params.ageMin) {
@@ -152,11 +152,10 @@ export default class DogFetchInterviewApiMockData {
         };
     }
 
-    private static getSharesStatesFunction(states: string[]) {
+    protected static getSharesStatesFunction(states: string[]) {
         return (validStates: string[]) => states.findIndex(state => validStates.includes(state)) !== -1;
     }
 
-    /** Since we don't use states for calcu */
     private static mapStateZip(value: {zip: string, state: string}, _index: number, _array: {zip: string, state: string}[]) {
         return {
             city: "Springfield",

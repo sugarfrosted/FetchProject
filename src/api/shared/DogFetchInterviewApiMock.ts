@@ -5,7 +5,7 @@ import {
     Match,
 } from './DogLookupInterfaces';
 import IDogFetchInterviewApi, { dogParams, locationsParams, mapSearchResults, } from './IDogFetchInterviewApi';
-import DogFetchInterviewApiMockData from './DogFetchInterviewApiMockData';
+import DogFetchInterviewApiMockData from '../data/DogFetchInterviewApiMockData';
 
 
 export default class DogFetchInterviewApiMock implements IDogFetchInterviewApi {
