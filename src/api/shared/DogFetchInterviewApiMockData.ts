@@ -1,6 +1,6 @@
-import { Dog, DogsSearchResult, } from './DogLookupInterfaces';
+import { Dog, DogsSearchResult, Location, } from './DogLookupInterfaces';
+import { dogParams, locationsParams, mapSearchResults, } from './IDogFetchInterviewApi';
 import Data from './DogFetchInterviewApiMockDogData.json';
-import { dogParams, } from './IDogFetchInterviewApi';
 
 type dogSortKey = (keyof Dog & ('name' | 'age' | 'breed'));
 
@@ -73,59 +73,98 @@ export default class DogFetchInterviewApiMockData {
         return { id: id, breed: (data[1] || "").replaceAll("_", " "), age: parseInt(data[2]) || 0, zip_code: data[3], name: data[4], img: "https://corgiorgy.com/corgiswimflip.gif" } as Dog;
     }
 
-    public static MapZipCodes(states: string[], city?: string) {
-        if (city && (city.search(/nowhere/i) > -1)) {
-            return undefined;
+    public static MapZipCodes({from, city, size, states}:  locationsParams): mapSearchResults {
+        var to = from + size;
+
+        if ((!states || states.length === 0) && !city) {
+            return {results: [], total: 0};
         }
 
-        if (states && states.length === 0 ) {
-            return ["00111", "06256", "10002", "20345", "30456", "45675", "53713", "67854", "78594", "84857", "95667"];
+        if (city && (city.search(/nowhere/i) > -1)) {
+            return {results: [], total: 0};
+        }
+
+        if (!states || states.length === 0 ) {
+            let cityStatePairs = [
+                { zip: "00111", state: "ON" },
+                { zip: "06256", state: "CT" },
+                { zip: "10002", state: "DE" },
+                { zip: "20345", state: "MD" },
+                { zip: "30456", state: "AL" },
+                { zip: "45675", state: "IN" },
+                { zip: "53713", state: "IA" },
+                { zip: "67854", state: "IL" },
+                { zip: "78594", state: "AR" },
+                { zip: "84857", state: "AZ" },
+                { zip: "95667", state: "CA" },
+            ];
+
+            let results = cityStatePairs.map(DogFetchInterviewApiMockData.mapStateZip);
+
+            return {
+                results: results.filter((_value, index) => from <= index && index < to),
+                total: results.length,
+            };
         }
 
         var containsStates = this.getSharesStatesFunction(states);
-        var zips: string[] = [];
+        let cityStatePairs: {zip: string, state: string}[] = [];
 
         if (containsStates(["NL", "PE", "NS", "NB", "QC", "ON", "MB", "SK", "AB", "BC", "YT", "NT", "NU"])) {
-            zips.push("00111");
+            cityStatePairs.push({ zip: "00111", state: "ON" });
         }
         if (containsStates(["CT", "MA", "ME", "NH", "NJ", "NY", "PR", "RI", "VT", "VI"])) {
-            zips.push("06256");
+            cityStatePairs.push({ zip: "06256", state: "CT" });
         }
         if (containsStates(["DE", "NY", "PA"])) {
-            zips.push("10002");
+            cityStatePairs.push({ zip: "10002", state: "DE" });
         }
         if (containsStates(["DC", "MD", "NC", "SC", "VA", "WV"])) {
-            zips.push("20345");
+            cityStatePairs.push({ zip: "20345", state: "MD" });
         }
         if (containsStates(["AL", "FL", "GA", "MS", "TN"])) {
-            zips.push("30456");
+            cityStatePairs.push({ zip: "30456", state: "AL" });
         }
         if (containsStates(["IN", "KY", "MI", "OH"])) {
-            zips.push("45675");
+            cityStatePairs.push({ zip: "45675", state: "IN" });
         }
         if (containsStates(["IA", "MN", "MT", "ND", "SD", "WI"])) {
-            zips.push("53713");
+            cityStatePairs.push({ zip: "53713", state: "IA" });
         }
         if (containsStates(["IL", "KS", "MO", "NE"])) {
-            zips.push("67854");
+            cityStatePairs.push({ zip: "67854", state: "IL" });
         }
         if (containsStates(["AR", "LA", "OK", "TX"])) {
-            zips.push("78594");
+            cityStatePairs.push({ zip: "78594", state: "AR" });
         }
         if (containsStates(["AZ", "CO", "ID", "NM", "NV", "UT", "WY"])) {
-            zips.push("84857");
+            cityStatePairs.push({ zip: "84857", state: "AZ" });
         }
         if (containsStates(["AK", "AS", "CA", "GU", "HI", "MH", "FM", "MP", "OR", "PW", "WA"])) {
-            zips.push("95667");
+            cityStatePairs.push({ zip: "95667", state: "CA" });
         }
 
+        let results = cityStatePairs.map(DogFetchInterviewApiMockData.mapStateZip);
 
-
-
-        return zips;
+        return {
+            results: results.filter((_value, index) => from <= index && index < to),
+            total: results.length,
+        };
     }
 
     private static getSharesStatesFunction(states: string[]) {
         return (validStates: string[]) => states.findIndex(state => validStates.includes(state)) !== -1;
+    }
+
+    /** Since we don't use states for calcu */
+    private static mapStateZip(value: {zip: string, state: string}, _index: number, _array: {zip: string, state: string}[]) {
+        return {
+            city: "Springfield",
+            county: "Shelby",
+            state: value.state,
+            zip_code: value.zip,
+            latitude: 0,
+            longitude: 0,
+        } as Location;
     }
 }

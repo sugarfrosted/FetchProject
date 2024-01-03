@@ -10,11 +10,16 @@ import DogFetchInterviewApiMockData from './DogFetchInterviewApiMockData';
 
 export default class DogFetchInterviewApiMock implements IDogFetchInterviewApi {
 
-    public IsLoggedIn = false;
-    public IsInErrorMode?: boolean;
+    public IsLoggedIn: boolean;
+    public IsConnectionTimedOut: boolean;
 
-    constructor(isInErrorMode?: boolean) {
-        this.IsInErrorMode = !!isInErrorMode;
+    constructor(isConnectionTimedOut: boolean = false, isLoggedIn: boolean = false) {
+        this.IsLoggedIn = isLoggedIn;
+        this.IsConnectionTimedOut = isConnectionTimedOut;
+    }
+
+    private get IsInErrorMode(): boolean {
+        return !this.IsLoggedIn || this.IsConnectionTimedOut;
     }
 
     private _name: string | null = null;
@@ -34,10 +39,6 @@ export default class DogFetchInterviewApiMock implements IDogFetchInterviewApi {
     }
 
     Post_Auth_Login(name: string, email: string): Promise<{ name: string; email: string; isLoggedIn: boolean; }> {
-
-        if (this.IsInErrorMode) {
-            return Promise.reject(401);
-        }
 
         this.Name = name;
         this.Email = email;
@@ -94,12 +95,21 @@ export default class DogFetchInterviewApiMock implements IDogFetchInterviewApi {
 
     }
 
+    /** Not actually used by the application, so leaving it unimplemented */
     Post_Locations(zipCodes: string[]): Promise<Location[]> {
+        if (this.IsInErrorMode) {
+            return Promise.reject(401);
+        }
+
         throw new Error('Method not implemented.');
     }
 
     Post_Locations_Search(params: locationsParams): Promise<mapSearchResults> {
-        throw new Error('Method not implemented.');
+        if (this.IsInErrorMode) {
+            return Promise.reject(401);
+        }
+
+        return Promise.resolve(DogFetchInterviewApiMockData.MapZipCodes(params));
     }
 
     /** Not implemented. */
