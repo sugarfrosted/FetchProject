@@ -1,7 +1,15 @@
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Icon,
+    Typography,
+} from '@mui/material';
+import {
     DataGrid,
     GridCallbackDetails,
     GridColDef,
+    GridExpandMoreIcon,
     GridPaginationModel,
     GridRenderCellParams,
     GridRowSelectionModel,
@@ -28,9 +36,6 @@ import {
 import {
     GridApiCommunity,
 } from '@mui/x-data-grid/internals';
-import {
-    Icon,
-} from '@mui/material';
 import {
     Image,
 } from '@mui/icons-material';
@@ -177,32 +182,42 @@ export default function DogSearchResultsDataGrid(props: DogSearchResultsDataGrid
 
     return (
     /* eslint-disable indent */
-      <>
-        <DataGrid
-          checkboxSelection={true}
-          keepNonExistentRowsSelected={true}
-          rowCount={props.rowCount}
-          rows={props.rows}
-          apiRef={apiRef}
-          columns={columns}
-          paginationMode='server'
-          onPaginationModelChange={onPaginationModelChange}
-          onSortModelChange={onSortModelChange}
-          paginationModel={pageModel}
-          loading={isLoading}
-          onRowSelectionModelChange={props.onRowSelectionModelChange}
-          rowSelectionModel={props.selection}
-          sortingMode='server'
-          pageSizeOptions={[5, 10, 25, 50, 100]}
-          slotProps={{
-            cell: {
-              onMouseEnter: handlePopoverOpen,
-              onMouseLeave: handlePopoverClose,
-            },
-          }}
-        />
-        <DogImagePopover open={!!anchorEl} dog={depictedDog} anchorEl={anchorEl} onClose={handlePopoverClose}/>
-      </>
+      <Accordion defaultExpanded>
+        <AccordionSummary
+          sx={{backgroundColor: "#1976D2", color: "white"}}
+          aria-controls="panel1d-content"
+          id="panel1d-header"
+          expandIcon={<GridExpandMoreIcon sx={{color: "white"}}/>}
+        >
+          <Typography>Filter Settings</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <DataGrid
+            checkboxSelection={true}
+            keepNonExistentRowsSelected={true}
+            rowCount={props.rowCount}
+            rows={props.rows}
+            apiRef={apiRef}
+            columns={columns}
+            paginationMode='server'
+            onPaginationModelChange={onPaginationModelChange}
+            onSortModelChange={onSortModelChange}
+            paginationModel={pageModel}
+            loading={isLoading}
+            onRowSelectionModelChange={props.onRowSelectionModelChange}
+            rowSelectionModel={props.selection}
+            sortingMode='server'
+            pageSizeOptions={[5, 10, 25, 50, 100]}
+            slotProps={{
+              cell: {
+                onMouseEnter: handlePopoverOpen,
+                onMouseLeave: handlePopoverClose,
+              },
+            }}
+          />
+          <DogImagePopover open={!!anchorEl} dog={depictedDog} anchorEl={anchorEl} onClose={handlePopoverClose}/>
+        </AccordionDetails>
+      </Accordion>
     /* eslint-enable indent */
     );
 }
