@@ -122,7 +122,12 @@ export default function DogSearchCriteria(props: DogSearchCriteriaControlProps) 
     return (
     /* eslint-disable indent */
       <Accordion defaultExpanded onChange={onAccordionExpansionChange}>
-        <AccordionSummary sx={{backgroundColor: "#1976D2", color: "white"}} aria-controls="panel1d-content" id="panel1d-header" expandIcon={<GridExpandMoreIcon sx={{color: "white"}}/>}>
+        <AccordionSummary
+          sx={{backgroundColor: "#1976D2", color: "white"}}
+          aria-controls="panel1d-content"
+          id="panel1d-header"
+          expandIcon={<GridExpandMoreIcon sx={{color: "white"}}/>}
+        >
           <Typography>Filter Settings</Typography>
         </AccordionSummary>
         <AccordionDetails>
