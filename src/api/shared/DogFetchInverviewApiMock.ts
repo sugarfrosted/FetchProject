@@ -69,7 +69,17 @@ export class DogFetchInverviewApiMock implements IDogFetchInterviewApi {
     }
 
     Post_Dogs_Match(dogsIds: string[]): Promise<Match> {
-        throw new Error('Method not implemented.');
+        if (this.IsInErrorMode) {
+            return Promise.reject(401);
+        }
+
+        if (dogsIds.length === 0) {
+            // no match found
+            return Promise.resolve({} as Match);
+        }
+
+        return Promise.resolve({ match: dogsIds[0]});
+
     }
 
     Post_Locations(zipCodes: string[]): Promise<Location[]> {
