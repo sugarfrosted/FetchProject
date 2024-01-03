@@ -72,4 +72,60 @@ export class DogFetchInverviewApiMockData {
         var data = id.split('%');
         return { id: id, breed: (data[1] || "").replaceAll("_", " "), age: parseInt(data[2]) || 0, zip_code: data[3], name: data[4], img: "https://corgiorgy.com/corgiswimflip.gif" } as Dog;
     }
+
+    public static MapZipCodes(states: string[], city?: string) {
+        if (city && (city.search(/nowhere/i) > -1)) {
+            return undefined;
+        }
+
+        if (states && states.length === 0 ) {
+            return ["00111", "06256", "10002", "20345", "30456", "45675", "53713", "67854", "78594", "84857", "95667"];
+        }
+
+        var containsStates = this.getSharesStatesFunction(states);
+        var zips: string[] = [];
+
+        if (containsStates(["NL", "PE", "NS", "NB", "QC", "ON", "MB", "SK", "AB", "BC", "YT", "NT", "NU"])) {
+            zips = zips.concat(["00111"]);
+        }
+        if (containsStates(["CT", "MA", "ME", "NH", "NJ", "NY", "PR", "RI", "VT", "VI"])) {
+            zips = zips.concat(["06256"]);
+        }
+        if (containsStates(["DE", "NY", "PA"])) {
+            zips = zips.concat(["10002"]);
+        }
+        if (containsStates(["DC", "MD", "NC", "SC", "VA", "WV"])) {
+            zips = zips.concat(["20345"]);
+        }
+        if (containsStates(["AL", "FL", "GA", "MS", "TN"])) {
+            zips = zips.concat(["30456"]);
+        }
+        if (containsStates(["IN", "KY", "MI", "OH"])) {
+            zips = zips.concat(["45675"]);
+        }
+        if (containsStates(["IA", "MN", "MT", "ND", "SD", "WI"])) {
+            zips = zips.concat(["53713"]);
+        }
+        if (containsStates(["IL", "KS", "MO", "NE"])) {
+            zips = zips.concat(["67854"]);
+        }
+        if (containsStates(["AR", "LA", "OK", "TX"])) {
+            zips = zips.concat(["78594"]);
+        }
+        if (containsStates(["AZ", "CO", "ID", "NM", "NV", "UT", "WY"])) {
+            zips = zips.concat(["84857"]);
+        }
+        if (containsStates(["AK", "AS", "CA", "GU", "HI", "MH", "FM", "MP", "OR", "PW", "WA"])) {
+            zips = zips.concat(["95667"]);
+        }
+
+
+
+
+        return zips;
+    }
+
+    private static getSharesStatesFunction(states: string[]) {
+        return (validStates: string[]) => states.findIndex(state => validStates.includes(state)) !== -1;
+    }
 }

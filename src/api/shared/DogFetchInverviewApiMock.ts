@@ -11,7 +11,7 @@ import { IDogFetchInterviewApi, } from './IDogFetchInterviewApi';
 export class DogFetchInverviewApiMock implements IDogFetchInterviewApi {
 
     IsLoggedIn = false;
-    public IsInErrorMode: boolean;
+    public IsInErrorMode?: boolean;
 
     constructor(isInErrorMode: boolean) {
         this.IsInErrorMode = !!isInErrorMode;
@@ -80,7 +80,8 @@ export class DogFetchInverviewApiMock implements IDogFetchInterviewApi {
         throw new Error('Method not implemented.');
     }
 
-    Run_Get_Query(request: string): Promise<DogsSearchResult> {
+    /** Not implemented. */
+    Run_Get_Query(request_: string): Promise<DogsSearchResult> {
         throw new Error('Method not implemented.');
     }
 

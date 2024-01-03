@@ -4,7 +4,7 @@ from string import digits, ascii_uppercase
 from random import choices 
 
 breeds = [ "Afghan", "Beagle", "Chihuahua", "Dachshund", "English Setter" ]
-zips =  [ "06256", "10002", "20345", "30456", "45675", "53713", "67854", "78594", "84857", "95667" ]
+zips =  [ "00111", "06256", "10002", "20345", "30456", "45675", "53713", "67854", "78594", "84857", "95667" ]
 names = [ "Allen", "Becky", "Charlie", "Dave" ]
 
 idGenerator = ((''.join(choices(ascii_uppercase + digits, k=6)), i) for i in count())
@@ -23,7 +23,7 @@ for item in thing:
     id = f'{random}{ordinal}%{breed.replace(" ", "_")}%{age}%{zipCode}%{name}';
 
     print("{",
-            '"id":', '"' + id + '",', 
+        '"id":', '"' + id + '",', 
         '"breed":', '"' + breed + '",',
         '"age":', str(age) + ",",
         '"zip":', '"' + zipCode + '",',
