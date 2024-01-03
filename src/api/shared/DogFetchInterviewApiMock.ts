@@ -8,7 +8,7 @@ import IDogFetchInterviewApi, { dogParams, locationsParams, mapSearchResults, } 
 import DogFetchInterviewApiMockData from './DogFetchInterviewApiMockData';
 
 
-export class DogFetchInterviewApiMock implements IDogFetchInterviewApi {
+export default class DogFetchInterviewApiMock implements IDogFetchInterviewApi {
 
     public IsLoggedIn = false;
     public IsInErrorMode?: boolean;
