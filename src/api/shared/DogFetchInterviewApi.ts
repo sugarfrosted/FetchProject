@@ -38,6 +38,9 @@ export default class DogFetchInverviewApi implements IDogFetchInterviewApi {
     public async Post_Auth_Login(name: string, email: string): Promise<{ name: string; email: string; isLoggedIn: boolean; }> {
         const request = await axios.request(
             {
+                baseURL: this.baseUrl,
+                timeout: 1000,
+                withCredentials: true,
                 method: 'post',
                 url: '/auth/login',
                 data: {
@@ -92,10 +95,6 @@ export default class DogFetchInverviewApi implements IDogFetchInterviewApi {
                 method: 'get',
                 url: '/dogs/breeds',
             }) as AxiosResponse<string[]>;
-
-            if (response.status !== 200) {
-                return Promise.reject();
-            }
 
         return response.data || [];
     }
