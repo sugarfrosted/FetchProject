@@ -80,11 +80,6 @@ export default class DogFetchInverviewApi implements IDogFetchInterviewApi {
 
     constructor(baseURL: string) {
         this.baseUrl = baseURL;
-        // axios = axios.create({
-        //     baseURL: baseURL,
-        //     timeout: 1000,
-        //     withCredentials: true,
-        // } as CreateAxiosDefaults<any>);
     }
 
 
@@ -97,6 +92,10 @@ export default class DogFetchInverviewApi implements IDogFetchInterviewApi {
                 method: 'get',
                 url: '/dogs/breeds',
             }) as AxiosResponse<string[]>;
+
+            if (response.status !== 200) {
+                return Promise.reject();
+            }
 
         return response.data || [];
     }
