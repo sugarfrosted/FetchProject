@@ -156,7 +156,7 @@ export default class DogFetchInterviewApiMockData {
         return (validStates: string[]) => states.findIndex(state => validStates.includes(state)) !== -1;
     }
 
-    private static mapStateZip(value: {zip: string, state: string}, _index: number, _array: {zip: string, state: string}[]) {
+    protected static mapStateZip(value: {zip: string, state: string}, _index?: number, _array?: {zip: string, state: string}[]) {
         return {
             city: "Springfield",
             county: "Shelby",

@@ -6,9 +6,7 @@ import {
 } from './DogLookupInterfaces';
 import IDogFetchInterviewApi, { dogParams, locationsParams, mapSearchResults, } from './IDogFetchInterviewApi';
 import axios, {
-    AxiosInstance,
     AxiosResponse,
-    CreateAxiosDefaults,
 } from 'axios';
 
 export default class DogFetchInverviewApi implements IDogFetchInterviewApi {

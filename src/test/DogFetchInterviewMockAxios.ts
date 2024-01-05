@@ -32,10 +32,9 @@ export function GetAxiosResponseHandler(config: AxiosRequestConfig<unknown>, tim
         case '/dogs/match':
         case '/locations':
         case '/locations/search':
-            break;
+        default:
+            throw new Error("Post Url not supported");
         }
-
-        throw new Error("Post Url not supported");
     }
 
     function GetHandler(config: AxiosRequestConfig<unknown>) {
@@ -44,12 +43,10 @@ export function GetAxiosResponseHandler(config: AxiosRequestConfig<unknown>, tim
         case '/dogs/breeds':
             return Promise.resolve({status: 200, data: ["Afghan", "Beagle", "Chihuahua", "Dachshund", "English Setter"]});
         case '/dogs/search':
-            break;
+        default:
+            throw new Error("Get Url not supported");
         }
-
-        throw new Error("Get Url not supported");
     }
-
 }
 
 export function GetAxiosGetHandler(request: string, config: AxiosRequestConfig<unknown>) {
