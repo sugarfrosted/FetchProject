@@ -10,6 +10,13 @@ class TestDogFetchInterviewApiMockData extends DogFetchInterviewApiMockData {
     public static ExposedMapStateZip(state: string, zip: string) {
         return TestDogFetchInterviewApiMockData.mapStateZip({zip: zip, state: state});
     }
+
+    constructor(dogs?: dogDataFormat) {
+        super();
+        if (dogs) {
+            this.dogData = TestDogFetchInterviewApiMockData.mapDogs(dogs);
+        }
+    }
 }
 
 test("mapStateZip Works with states provided", () => {
@@ -65,7 +72,7 @@ test("mapStateZip Has Expected Form for input", () => {
     expect(result.zip_code).toEqual("06256");
 });
 
-test.only("Get Dog From Id parses correctly", () => {
+test("Get Dog From Id parses correctly", () => {
     expect(TestDogFetchInterviewApiMockData.getDataFromId("0131O821%Afghan%4%45675%Becky"))
         .toMatchObject({id: "0131O821%Afghan%4%45675%Becky", breed: "Afghan", age: 4, zip_code: "45675", name: "Becky"} as Dog);
 
@@ -76,7 +83,27 @@ test.only("Get Dog From Id parses correctly", () => {
         .toMatchObject({id:"2K38BE196%English_Setter%9%45675%Allen", breed: "English Setter", age: 9, zip_code: "45675", name: "Allen" } as Dog);
 
 
-    // id = "0131O821%Afghan%4%45675%Becky";
-    // result = TestDogFetchInterviewApiMockData.getDataFromId(id);
-    // expect(result).toMatchObject({id: expect.stringMatching(id), breed: "Afghan", age: 4, zip_code: "45675", name: "Becky"} as Dog);
+});
+
+test.only("Check id getter", () => {
+
+    var dogData = [
+        { "id": "E59ZAD0%Allen%0%English Setter%10002", "breed": "Allen", "age": 3, "zip": "English Setter", "name": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" },
+        { "id": "4HSUNN1%Becky%1%Dachshund%10002", "breed": "Becky", "age": 1, "zip": "Dachshund", "name": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" },
+        { "id": "Z72GAL2%Charlie%2%Chihuahua%10002", "breed": "Charlie", "age": 0, "zip": "Chihuahua", "name": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" },
+        { "id": "6M37RC3%Dave%3%Beagle%10002", "breed": "Dave", "age": 2, "zip": "Beagle", "name": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" },
+        { "id": "J9HVM24%Eric%4%Afghan%10002", "breed": "Eric", "age": 4, "zip": "Afghan", "name": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" }];
+
+    var api = new TestDogFetchInterviewApiMockData(dogData);
+
+
+    //expect(api.GetDogIds({}).resultIds).toHaveLength(5);
+
+    expect(api.GetDogIds({sort: "age:asc"}).resultIds).toEqual([
+        "E59ZAD0%Allen%0%English Setter%10002",
+        "4HSUNN1%Becky%1%Dachshund%10002",
+        "Z72GAL2%Charlie%2%Chihuahua%10002",
+        "6M37RC3%Dave%3%Beagle%10002",
+        "J9HVM24%Eric%4%Afghan%10002"]);
+
 });

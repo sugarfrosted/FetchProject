@@ -4,15 +4,21 @@ import Data from './DogFetchInterviewApiMockDogData.json';
 
 type dogSortKey = (keyof Dog & ('name' | 'age' | 'breed'));
 
+export type dogDataFormat = typeof Data.dogs;
+
 export default class DogFetchInterviewApiMockData {
     constructor() {
-        this.dogData = Data.dogs.map(value => {
+        this.dogData = DogFetchInterviewApiMockData.mapDogs(Data.dogs);
+    }
+
+    protected dogData: Dog[];
+
+    protected static mapDogs(dogs: dogDataFormat) {
+        return dogs.map(value => {
             return {age: value.age, breed: value.breed, zip_code: value.zip, name: value.name, img: value.img, id: value.id } as Dog;
         });
 
     }
-
-    private dogData: Dog[];
 
     protected static GetFilterFunction(params: dogParams) {
         return (dog: Dog, index: number) => {
