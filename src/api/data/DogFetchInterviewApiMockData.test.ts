@@ -1,6 +1,7 @@
+import DogFetchInterviewApiMockData, { dogDataFormat } from "./DogFetchInterviewApiMockData";
 import { Dog, } from "../shared/DogLookupInterfaces";
-import DogFetchInterviewApiMockData from "./DogFetchInterviewApiMockData";
 
+var api: TestDogFetchInterviewApiMockData;
 
 class TestDogFetchInterviewApiMockData extends DogFetchInterviewApiMockData {
     public static ExposedGetSharesStatesFunction(states: string[]) {
@@ -85,25 +86,151 @@ test("Get Dog From Id parses correctly", () => {
 
 });
 
-test.only("Check id getter", () => {
-
+beforeEach(() => {
     var dogData = [
-        { "id": "E59ZAD0%Allen%0%English Setter%10002", "breed": "Allen", "age": 3, "zip": "English Setter", "name": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" },
-        { "id": "4HSUNN1%Becky%1%Dachshund%10002", "breed": "Becky", "age": 1, "zip": "Dachshund", "name": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" },
-        { "id": "Z72GAL2%Charlie%2%Chihuahua%10002", "breed": "Charlie", "age": 0, "zip": "Chihuahua", "name": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" },
-        { "id": "6M37RC3%Dave%3%Beagle%10002", "breed": "Dave", "age": 2, "zip": "Beagle", "name": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" },
-        { "id": "J9HVM24%Eric%4%Afghan%10002", "breed": "Eric", "age": 4, "zip": "Afghan", "name": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" }];
+        { "id": "E59ZAD0%Allen%3%English_Setter%10002", "name": "Allen", "age": 3, "breed": "English Setter", "zip": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" },
+        { "id": "4HSUNN1%Becky%1%Dachshund%10002", "name": "Becky", "age": 1, "breed": "Dachshund", "zip": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" },
+        { "id": "Z72GAL2%Charlie%0%Chihuahua%10002", "name": "Charlie", "age": 0, "breed": "Chihuahua", "zip": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" },
+        { "id": "6M37RC3%Dave%2%Beagle%10002", "name": "Dave", "age": 2, "breed": "Beagle", "zip": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" },
+        { "id": "J9HVM24%Eric%4%Afghan%10002", "name": "Eric", "age": 4, "breed": "Afghan", "zip": "10002", "img": "https://corgiorgy.com/corgiswimflip.gif" }];
 
-    var api = new TestDogFetchInterviewApiMockData(dogData);
+    api = new TestDogFetchInterviewApiMockData(dogData);
+});
 
+test("Validate GetDogIds default output count", () => {
+    expect(api.GetDogIds({}).resultIds).toHaveLength(5);
+});
 
-    //expect(api.GetDogIds({}).resultIds).toHaveLength(5);
-
+test("Check id getter sort by age:asc", () => {
     expect(api.GetDogIds({sort: "age:asc"}).resultIds).toEqual([
-        "E59ZAD0%Allen%0%English Setter%10002",
+        "Z72GAL2%Charlie%0%Chihuahua%10002",
         "4HSUNN1%Becky%1%Dachshund%10002",
-        "Z72GAL2%Charlie%2%Chihuahua%10002",
-        "6M37RC3%Dave%3%Beagle%10002",
-        "J9HVM24%Eric%4%Afghan%10002"]);
+        "6M37RC3%Dave%2%Beagle%10002",
+        "E59ZAD0%Allen%3%English_Setter%10002",
+        "J9HVM24%Eric%4%Afghan%10002",
+    ]);
+});
 
+test("Check id getter sort by age:desc", () => {
+    expect(api.GetDogIds({sort: "age:desc"}).resultIds).toEqual([
+        "J9HVM24%Eric%4%Afghan%10002",
+        "E59ZAD0%Allen%3%English_Setter%10002",
+        "6M37RC3%Dave%2%Beagle%10002",
+        "4HSUNN1%Becky%1%Dachshund%10002",
+        "Z72GAL2%Charlie%0%Chihuahua%10002",
+    ]);
+});
+
+test("Check id getter sort by name:desc", () => {
+    expect(api.GetDogIds({sort: "name:desc"}).resultIds).toEqual([
+        "J9HVM24%Eric%4%Afghan%10002",
+        "6M37RC3%Dave%2%Beagle%10002",
+        "Z72GAL2%Charlie%0%Chihuahua%10002",
+        "4HSUNN1%Becky%1%Dachshund%10002",
+        "E59ZAD0%Allen%3%English_Setter%10002",
+    ]);
+});
+
+test("Check id getter sort by name:asc", () => {
+    expect(api.GetDogIds({sort: "name:asc"}).resultIds).toEqual([
+        "E59ZAD0%Allen%3%English_Setter%10002",
+        "4HSUNN1%Becky%1%Dachshund%10002",
+        "Z72GAL2%Charlie%0%Chihuahua%10002",
+        "6M37RC3%Dave%2%Beagle%10002",
+        "J9HVM24%Eric%4%Afghan%10002",
+    ]);
+});
+
+test("Check id getter sort by breed:desc", () => {
+
+    expect(api.GetDogIds({sort: "breed:desc"}).resultIds).toEqual([
+        "E59ZAD0%Allen%3%English_Setter%10002",
+        "4HSUNN1%Becky%1%Dachshund%10002",
+        "Z72GAL2%Charlie%0%Chihuahua%10002",
+        "6M37RC3%Dave%2%Beagle%10002",
+        "J9HVM24%Eric%4%Afghan%10002",
+    ]);
+});
+
+test("Check id getter sort by breed:asc", () => {
+
+    expect(api.GetDogIds({sort: "breed:asc"}).resultIds).toEqual([
+        "J9HVM24%Eric%4%Afghan%10002",
+        "6M37RC3%Dave%2%Beagle%10002",
+        "Z72GAL2%Charlie%0%Chihuahua%10002",
+        "4HSUNN1%Becky%1%Dachshund%10002",
+        "E59ZAD0%Allen%3%English_Setter%10002",
+    ]);
+});
+
+test("Default Sort is breed:asc", () => {
+
+    expect(api.GetDogIds({}).resultIds).toEqual([
+        "J9HVM24%Eric%4%Afghan%10002",
+        "6M37RC3%Dave%2%Beagle%10002",
+        "Z72GAL2%Charlie%0%Chihuahua%10002",
+        "4HSUNN1%Becky%1%Dachshund%10002",
+        "E59ZAD0%Allen%3%English_Setter%10002",
+    ]);
+});
+
+test("Validate GetDogIds paging", () => {
+    var result = api.GetDogIds({size: 2});
+    expect(result.resultIds).toHaveLength(2);
+    expect(result.total).toStrictEqual(5);
+    expect(result.resultIds).toEqual([
+        "J9HVM24%Eric%4%Afghan%10002",
+        "6M37RC3%Dave%2%Beagle%10002",
+    ]);
+});
+
+test("Filter on single Breeds", () => {
+    expect(api.GetDogIds({breeds: ["Afghan"]}).resultIds).toEqual([
+        "J9HVM24%Eric%4%Afghan%10002",
+    ]);
+
+    expect(api.GetDogIds({breeds: ["Corgi"]}).resultIds).toEqual([
+    ]);
+
+    expect(api.GetDogIds({breeds: ["English Setter"]}).resultIds).toEqual([
+        "E59ZAD0%Allen%3%English_Setter%10002",
+    ]);
+});
+
+test("Filter on multiple Breeds", () => {
+    expect(api.GetDogIds({breeds: ["Afghan", "Beagle"]}).resultIds).toEqual([
+        "J9HVM24%Eric%4%Afghan%10002",
+        "6M37RC3%Dave%2%Beagle%10002",
+    ]);
+
+    expect(api.GetDogIds({breeds: ["Afghan", "Corgi"]}).resultIds).toEqual([
+        "J9HVM24%Eric%4%Afghan%10002",
+    ]);
+});
+
+test("Filter on ages", () => {
+    expect(api.GetDogIds({ageMax: 3, ageMin:1}).resultIds).toEqual([
+        "6M37RC3%Dave%2%Beagle%10002",
+        "4HSUNN1%Becky%1%Dachshund%10002",
+        "E59ZAD0%Allen%3%English_Setter%10002",
+    ]);
+
+    expect(api.GetDogIds({ageMax: 3}).resultIds).toEqual([
+        "6M37RC3%Dave%2%Beagle%10002",
+        "Z72GAL2%Charlie%0%Chihuahua%10002",
+        "4HSUNN1%Becky%1%Dachshund%10002",
+        "E59ZAD0%Allen%3%English_Setter%10002",
+    ]);
+
+    expect(api.GetDogIds({ageMin: 2}).resultIds).toEqual([
+        "J9HVM24%Eric%4%Afghan%10002",
+        "6M37RC3%Dave%2%Beagle%10002",
+        "E59ZAD0%Allen%3%English_Setter%10002",
+    ]);
+
+});
+
+test("Filter on zipCode", () => {
+    expect(api.GetDogIds({zipCodes: ["00111"]}).resultIds).toHaveLength(0);
+    expect(api.GetDogIds({zipCodes: ["10002"]}).resultIds).toHaveLength(5);
 });

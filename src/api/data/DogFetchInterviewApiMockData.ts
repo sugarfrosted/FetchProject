@@ -49,21 +49,26 @@ export default class DogFetchInterviewApiMockData {
         var sortDirection = ['asc', 'desc'].includes(sortSplit[1]) ? sortSplit[1] as ('asc' | 'desc') : 'asc';
 
         var sortFunction: (a: Dog, b: Dog) => number = function (a: Dog, b: Dog) {
-            var sortDirectionFactor = sortDirection === 'asc' ? 1 : -1;
             if (typeof a[sortKey] === "number" && b[sortKey] === "number") {
-                return sortDirectionFactor * ((a[sortKey] as number) - (b[sortKey] as number));
+                return (a[sortKey] as number) - (b[sortKey] as number);
             } else {
-                return sortDirectionFactor * ((a[sortKey] < b[sortKey]) ? -1 : ((a[sortKey] > b[sortKey]) ? 1 : 0));
+                return (a[sortKey] < b[sortKey]) ? -1 : ((a[sortKey] > b[sortKey]) ? 1 : 0);
             }
         };
 
         this.dogData.sort(sortFunction);
+
+        if (sortDirection === 'desc') {
+            this.dogData.reverse();
+        }
 
         var rangeStart = params.from || 0;
         var rangeEnd = rangeStart + (params.size || 25);
 
         var totalResults = this.dogData.filter(DogFetchInterviewApiMockData.GetFilterFunction(params))
             .map(value => value.id);
+
+        // console.log(totalResults);
 
         return { total: totalResults.length, resultIds: totalResults.filter((_id, index) => (rangeStart <= index && index < rangeEnd)) };
     }

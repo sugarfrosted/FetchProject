@@ -11,8 +11,8 @@ def __main__():
 
     
 
-    #dataGenerator = product(breeds, zips , names[:4]);
-    dataGenerator = zip(names, reversed(breeds), repeat("10002"))
+    #dataGenerator = product(breeds, zips , names[:4])
+    dataGenerator = zip(reversed(breeds), repeat("10002"), names)
     printData(dataGenerator)
 
 

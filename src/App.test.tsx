@@ -3,6 +3,5 @@ import App from './App';
 
 
 test('renders App', () => {
-    console.log("I exist");
-    //render(<App />);
+    render(<App />);
 });
