@@ -48,7 +48,7 @@ export function GetAxiosResponseHandler(config: AxiosRequestConfig<unknown>, tim
         case '/dogs/breeds':
             return Promise.resolve({status: 200, data: ["Afghan", "Beagle", "Chihuahua", "Dachshund", "English Setter"]});
         case '/dogs/search': {
-            return Promise.resolve(dataServiceInstance.GetDogIds(config.params));
+            return Promise.resolve({status: 200, data: dataServiceInstance.GetDogIds(config.params)});
         }
         default:
             throw new Error("Get Url not supported");
