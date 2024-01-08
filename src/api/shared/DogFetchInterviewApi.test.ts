@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig, } from 'axios';
 import DogFetchInverviewApi, { LoginResponse, } from './DogFetchInterviewApi';
 import { GetAxiosResponseHandler, } from '../../test/DogFetchInterviewMockAxios';
+import { DogsSearchResult } from './DogLookupInterfaces';
 
 
 const timedOut = {value: false};
@@ -43,3 +44,7 @@ test("Get Breeds", async () => {
     await expect(sharedApi.Get_Dogs_Breeds()).resolves.toMatchObject([]);
 });
 
+test("Get_Dogs_Search", async () => {
+    await expect(sharedApi.Get_Dogs_Search({})).resolves.toMatchObject({});
+
+});
