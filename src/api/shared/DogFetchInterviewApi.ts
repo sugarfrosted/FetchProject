@@ -9,6 +9,12 @@ import axios, {
     AxiosResponse,
 } from 'axios';
 
+export type LoginResponse = {
+    name: string;
+    email: string;
+    isLoggedIn: boolean;
+};
+
 export default class DogFetchInverviewApi implements IDogFetchInterviewApi {
 
     IsLoggedIn: boolean = false;
@@ -33,7 +39,7 @@ export default class DogFetchInverviewApi implements IDogFetchInterviewApi {
     /**
      * Login to the api and start a new session
      */
-    public async Post_Auth_Login(name: string, email: string): Promise<{ name: string; email: string; isLoggedIn: boolean; }> {
+    public async Post_Auth_Login(name: string, email: string): Promise<LoginResponse> {
         const request = await axios.request(
             {
                 baseURL: this.baseUrl,
