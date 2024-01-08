@@ -68,8 +68,6 @@ export default class DogFetchInterviewApiMockData {
         var totalResults = this.dogData.filter(DogFetchInterviewApiMockData.GetFilterFunction(params))
             .map(value => value.id);
 
-        // console.log(totalResults);
-
         return { total: totalResults.length, resultIds: totalResults.filter((_id, index) => (rangeStart <= index && index < rangeEnd)) };
     }
 
