@@ -1,9 +1,12 @@
-import { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig, } from "axios";
+import DogFetchInterviewApiMockData from "../api/data/DogFetchInterviewApiMockData";
 import {
     validate as isValidEmail,
 } from "email-validator";
 
 export function GetAxiosResponseHandler(config: AxiosRequestConfig<unknown>, timedOut: {value: boolean}) : Promise<any> {
+    var dataServiceInstance = new DogFetchInterviewApiMockData();
+
     if (timedOut.value) {
         return Promise.resolve({status: 401});
     }
@@ -29,7 +32,9 @@ export function GetAxiosResponseHandler(config: AxiosRequestConfig<unknown>, tim
                 return Promise.resolve({ status: 400 });
             }}
         case '/dogs':
+            return Promise.resolve((config.data as string[]).map(x => DogFetchInterviewApiMockData.getDataFromId(x)));
         case '/dogs/match':
+            return Promise.resolve((config.data as string[])[0] || null);
         case '/locations':
         case '/locations/search':
         default:
@@ -42,7 +47,9 @@ export function GetAxiosResponseHandler(config: AxiosRequestConfig<unknown>, tim
 
         case '/dogs/breeds':
             return Promise.resolve({status: 200, data: ["Afghan", "Beagle", "Chihuahua", "Dachshund", "English Setter"]});
-        case '/dogs/search':
+        case '/dogs/search': {
+            return Promise.resolve(dataServiceInstance.GetDogIds(config.params));
+        }
         default:
             throw new Error("Get Url not supported");
         }
