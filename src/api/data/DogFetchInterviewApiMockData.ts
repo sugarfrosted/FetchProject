@@ -83,7 +83,8 @@ export default class DogFetchInterviewApiMockData {
     }
 
     public static MapZipCodes({from, city, size, states}:  locationsParams): mapSearchResults {
-        var to = from + size;
+        var trueFrom = from || 0;
+        var to = trueFrom + (size || 25);
 
         if ((!states || states.length === 0) && !city) {
             return {results: [], total: 0};
@@ -111,7 +112,7 @@ export default class DogFetchInterviewApiMockData {
             let results = cityStatePairs.map(DogFetchInterviewApiMockData.mapStateZip);
 
             return {
-                results: results.filter((_value, index) => from <= index && index < to),
+                results: results.filter((_value, index) => trueFrom <= index && index < to),
                 total: results.length,
             };
         }
@@ -153,10 +154,10 @@ export default class DogFetchInterviewApiMockData {
             cityStatePairs.push({ zip: "95667", state: "CA" });
         }
 
-        let results = cityStatePairs.map(DogFetchInterviewApiMockData.mapStateZip);
+        var results = cityStatePairs.map(DogFetchInterviewApiMockData.mapStateZip);
 
         return {
-            results: results.filter((_value, index) => from <= index && index < to),
+            results: results.filter((_value, index) => trueFrom <= index && index < to),
             total: results.length,
         };
     }

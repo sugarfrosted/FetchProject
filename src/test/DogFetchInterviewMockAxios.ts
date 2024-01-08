@@ -3,6 +3,7 @@ import DogFetchInterviewApiMockData from "../api/data/DogFetchInterviewApiMockDa
 import {
     validate as isValidEmail,
 } from "email-validator";
+import { locationsParams, } from "../api/shared/IDogFetchInterviewApi";
 
 export function GetAxiosResponseHandler(config: AxiosRequestConfig<unknown>, timedOut: {value: boolean}) : Promise<any> {
     var dataServiceInstance = new DogFetchInterviewApiMockData();
@@ -32,13 +33,29 @@ export function GetAxiosResponseHandler(config: AxiosRequestConfig<unknown>, tim
                 return Promise.resolve({ status: 400 });
             }}
         case '/dogs':
-            return Promise.resolve((config.data as string[]).map(x => DogFetchInterviewApiMockData.getDataFromId(x)));
+            return Promise.resolve(
+                {
+                    data: (config.data as string[]).map(x => DogFetchInterviewApiMockData.getDataFromId(x)),
+                    status: 200,
+                }
+            );
         case '/dogs/match':
-            return Promise.resolve((config.data as string[])[0] || null);
+            return Promise.resolve(
+                {
+                    data: (config.data as string[])[0] || null,
+                    status: 200,
+                }
+            );
         case '/locations':
         case '/locations/search':
+            return Promise.resolve(
+                {
+                    data: DogFetchInterviewApiMockData.MapZipCodes(config.data as locationsParams),
+                    status: 200,
+                }
+            );
         default:
-            throw new Error("Post Url not supported");
+            throw new Error(`Post Url ${config.url} not supported`);
         }
     }
 
@@ -48,7 +65,7 @@ export function GetAxiosResponseHandler(config: AxiosRequestConfig<unknown>, tim
         case '/dogs/breeds':
             return Promise.resolve({status: 200, data: ["Afghan", "Beagle", "Chihuahua", "Dachshund", "English Setter"]});
         case '/dogs/search': {
-            return Promise.resolve(dataServiceInstance.GetDogIds(config.params));
+            return Promise.resolve({status: 200, data: dataServiceInstance.GetDogIds(config.params)});
         }
         default:
             throw new Error("Get Url not supported");

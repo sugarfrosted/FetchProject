@@ -47,7 +47,7 @@ export interface locationsParams {
     states?: string[];
     geoBoundingBox?: boundingBox;
     size?: number;
-    from?: any;
+    from?: number;
 }
 
 interface AllCorners {
