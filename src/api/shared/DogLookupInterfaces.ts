@@ -36,7 +36,7 @@ export interface DogsSearchResult {
 }
 
 export interface Match {
-    match: string;
+    match?: string;
 }
 
 export interface DogLookupFilter {

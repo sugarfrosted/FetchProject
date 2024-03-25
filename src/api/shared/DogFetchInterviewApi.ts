@@ -4,19 +4,23 @@ import {
     Location,
     Match,
 } from './DogLookupInterfaces';
+import IDogFetchInterviewApi, { dogParams, locationsParams, mapSearchResults, } from './IDogFetchInterviewApi';
 import axios, {
-    AxiosInstance,
     AxiosResponse,
-    CreateAxiosDefaults,
 } from 'axios';
 
+export type LoginResponse = {
+    name: string;
+    email: string;
+    isLoggedIn: boolean;
+};
 
-
-export default class DogFetchInverviewApi {
+export default class DogFetchInverviewApi implements IDogFetchInterviewApi {
 
     IsLoggedIn: boolean = false;
 
     private _name: string | null = null;
+    baseUrl: string;
     public get Name(): string | null {
         return this._name;
     }
@@ -32,14 +36,15 @@ export default class DogFetchInverviewApi {
         this._email = value;
     }
 
-    private axiosInstance: AxiosInstance;
-
     /**
      * Login to the api and start a new session
      */
-    public async Post_Auth_Login(name: string, email: string): Promise<{ name: string; email: string; isLoggedIn: boolean; }> {
-        const request = await this.axiosInstance.request(
+    public async Post_Auth_Login(name: string, email: string): Promise<LoginResponse> {
+        const request = await axios.request(
             {
+                baseURL: this.baseUrl,
+                timeout: 1000,
+                withCredentials: true,
                 method: 'post',
                 url: '/auth/login',
                 data: {
@@ -65,8 +70,11 @@ export default class DogFetchInverviewApi {
      * Revoke cookie
      */
     public async Post_Auth_Logout(): Promise<void> {
-        await this.axiosInstance.request(
+        await axios.request(
             {
+                baseURL: this.baseUrl,
+                timeout: 1000,
+                withCredentials: true,
                 method: 'post',
                 url: '/auth/logout',
             }
@@ -78,17 +86,16 @@ export default class DogFetchInverviewApi {
     }
 
     constructor(baseURL: string) {
-        this.axiosInstance = axios.create({
-            baseURL: baseURL,
-            timeout: 1000,
-            withCredentials: true,
-        } as CreateAxiosDefaults<any>);
+        this.baseUrl = baseURL;
     }
 
 
     public async Get_Dogs_Breeds(): Promise<string[]> {
-        const response = await this.axiosInstance.request(
+        const response = await axios.request(
             {
+                baseURL: this.baseUrl,
+                timeout: 1000,
+                withCredentials: true,
                 method: 'get',
                 url: '/dogs/breeds',
             }) as AxiosResponse<string[]>;
@@ -97,8 +104,11 @@ export default class DogFetchInverviewApi {
     }
 
     public async Get_Dogs_Search(params: dogParams): Promise<DogsSearchResult> {
-        const response = await this.axiosInstance.request(
+        const response = await axios.request(
             {
+                baseURL: this.baseUrl,
+                timeout: 1000,
+                withCredentials: true,
                 method: 'get',
                 url: '/dogs/search',
                 params: params,
@@ -110,8 +120,11 @@ export default class DogFetchInverviewApi {
     public async Post_Dogs(dogsIds: string[] | string) : Promise<Dog[]> {
         const dogsIdArray: string[] = typeof dogsIds === 'string' ? [dogsIds] : dogsIds;
 
-        const response = await this.axiosInstance.request(
+        const response = await axios.request(
             {
+                baseURL: this.baseUrl,
+                timeout: 1000,
+                withCredentials: true,
                 method: 'post',
                 url: '/dogs',
                 data: dogsIdArray,
@@ -123,8 +136,11 @@ export default class DogFetchInverviewApi {
 
     public async Post_Dogs_Match(dogsIds: string[]) : Promise<Match> {
 
-        const response = await this.axiosInstance.request(
+        const response = await axios.request(
             {
+                baseURL: this.baseUrl,
+                timeout: 1000,
+                withCredentials: true,
                 method: 'post',
                 url: '/dogs/match',
                 data: dogsIds,
@@ -134,8 +150,11 @@ export default class DogFetchInverviewApi {
     }
 
     public async Post_Locations(zipCodes: string[]) : Promise<Location[]> {
-        const response = await this.axiosInstance.request(
+        const response = await axios.request(
             {
+                baseURL: this.baseUrl,
+                timeout: 1000,
+                withCredentials: true,
                 method: 'post',
                 url: '/locations',
                 data: zipCodes,
@@ -145,8 +164,11 @@ export default class DogFetchInverviewApi {
     }
 
     public async Post_Locations_Search(params: locationsParams) : Promise<mapSearchResults> {
-        const response = await this.axiosInstance.request(
+        const response = await axios.request(
             {
+                baseURL: this.baseUrl,
+                timeout: 1000,
+                withCredentials: true,
                 method: 'post',
                 url: '/locations/search',
                 data: params,
@@ -155,59 +177,12 @@ export default class DogFetchInverviewApi {
         return response.data;
     }
 
-    public async Run_Get_Query(request: string) {
-        if (!request.match(/^\/dogs\/search\?/i)) {
-            return Promise.reject("Unsupported call.");
+    public async Run_Get_Query(request: string ) : Promise<DogsSearchResult> {
+        if (request.match(/^\/dogs\/search\?/i)) {
+            var response = await axios.get(request, {baseURL: this.baseUrl, timeout: 1000, withCredentials: true});
+            return response.data as Promise<DogsSearchResult>;
         }
 
-        var response = await this.axiosInstance.get(request);
-
-        return response.data;
+        return Promise.reject("Unsupported call.");
     }
 }
-
-export interface mapSearchResults {
-    results: Location[];
-    total: number;
-}
-
-
-export interface dogParams {
-    breeds?: string[];
-    zipCodes?: string[];
-    ageMin?: number | undefined;
-    ageMax?: number | undefined;
-    size?: number;
-    from?: number;
-    sort?: sortCombos;
-}
-
-/**The resulting supported sort keys by the api */
-export type sortCombos = 'name:asc' | 'name:desc' | 'age:asc' | 'age:desc' | 'breed:asc' | 'breed:desc';
-
-export interface locationsParams {
-    city?: string;
-    states?: string[];
-    geoBoundingBox?: boundingBox;
-    size?: number;
-    from?: any;
-}
-
-interface AllCorners {
-    top: Location,
-    bottom: Location,
-    left: Location,
-    right: Location,
-}
-
-interface BottomLeftToTopRight {
-    bottom_left: Location,
-    top_right: Location,
-}
-
-interface BottomRightToTopLeft {
-    bottom_right: Location,
-    top_left: Location,
-}
-
-export type boundingBox = BottomLeftToTopRight | BottomRightToTopLeft | AllCorners;
