@@ -14,7 +14,7 @@ var sharedApi: DogFetchInverviewApi;
 
 beforeEach(() => {
     timedOut.value = false;
-    mocked_axios.request.mockImplementation((config: AxiosRequestConfig<unknown> ) => {
+    (mocked_axios.request as any).mockImplementation((config: AxiosRequestConfig<unknown> ) => {
 
         return GetAxiosResponseHandler(config, timedOut);
     });
