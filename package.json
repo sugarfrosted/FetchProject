@@ -158,5 +158,8 @@
     "@stylistic/eslint-plugin-ts": "^1.5.0",
     "@types/lodash": "^4.14.202",
     "eslint-config-react-app": "^7.0.1"
+  },
+  "engines": {
+    "node": "21.x"
   }
 }
